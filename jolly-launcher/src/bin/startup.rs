@@ -91,7 +91,7 @@ fn setup_key_bindings() -> Result<()> {
         program: "bash".to_string(),
         arguments: vec![
             "-c".to_string(),
-            "if ! ps -C jolly-nav -o stat= | grep -v \"Z\" | grep -q .; then /home/zac/phs/jollypad/jolly/target/debug/jolly-nav; else pkill -USR1 -x jolly-nav; fi".to_string()
+            "if ! ps -C jolly-nav -o stat= | grep -v \"Z\" | grep -q .; then jolly-nav; else pkill -USR1 -x jolly-nav; fi".to_string()
         ],
     })?;
 
