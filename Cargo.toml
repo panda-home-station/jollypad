@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "catacomb",
+    "catacomb/catacomb_ipc",
+    "jolly/crates/core",
+    "jolly/crates/ui",
+    "jolly/apps/home",
+    "jolly/apps/nav",
+    "jolly/apps/settings",
+    "jolly-launcher",
+]

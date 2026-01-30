@@ -1,0 +1,22 @@
+[package]
+name = "jolly-launcher"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+catacomb_ipc = { path = "../catacomb/catacomb_ipc", features = ["clap"] }
+sysinfo = "0.30"
+anyhow = "1.0"
+dirs = "5.0"
+nix = { version = "0.27", features = ["signal"] }
+clap = { version = "4.4", features = ["derive"] }
+serde = "1.0"
+serde_json = "1.0"
+
+[[bin]]
+name = "jolly-launcher"
+path = "src/bin/launcher.rs"
+
+[[bin]]
+name = "jolly-startup"
+path = "src/bin/startup.rs"
