@@ -100,14 +100,17 @@ fn start_catacomb() -> Result<()> {
     let mut new_path = env::var("PATH").unwrap_or_default();
     
     // Add all potential binary locations
-    // Prioritize workspace target/debug
+    // Prioritize workspace target/release then debug
     let bin_dirs = vec![
+        cwd.join("target/release"),
+        cwd.join("catacomb/target/release"),
+        cwd.join("jolly/target/release"),
+        cwd.join("target/debug"),
         cwd.join("catacomb/target/debug"),
         cwd.join("jolly/target/debug"),
-        cwd.join("target/debug"),
     ];
 
-    for dir in bin_dirs {
+    for dir in bin_dirs.iter().rev() {
         if dir.exists() {
             new_path = format!("{}:{}", dir.display(), new_path);
         }
