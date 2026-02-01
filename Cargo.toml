@@ -3,7 +3,7 @@ resolver = "2"
 
 members = [
     "catacomb",
-    "catacomb/catacomb_ipc",
+    "crates/ipc",
     "jolly/crates/core",
     "jolly/crates/ui",
     "jolly/apps/home",
