@@ -200,6 +200,19 @@ fn set_environment_vars(envs: &mut HashMap<String, String>, config: &HashMap<Str
         envs.insert("PROTON_USE_WOW64".to_string(), "1".to_string());
     }
 
+    // Audio fixes for Proton:
+    // 1. Force higher latency to prevent buffer underruns/dropouts which cause HDMI resync
+    envs.insert("PULSE_LATENCY_MSEC".to_string(), "60".to_string());
+    // 2. Ensure we use PulseAudio backend (which pipes to PipeWire)
+    envs.insert("SDL_AUDIODRIVER".to_string(), "pulseaudio".to_string());
+
+    // 3. Force FSR disabled for Steam/Games to prevent scaling weirdness unless requested
+    // This helps ensure games see the real resolution
+    envs.insert("WINE_FULLSCREEN_FSR".to_string(), "0".to_string());
+    
+    // 4. Suppress pressure-vessel 32-bit warnings if possible (cosmetic but clean logs)
+    // envs.insert("PRESSURE_VESSEL_VERBOSE".to_string(), "0".to_string());
+
     // Set WINEPREFIX to ~/.jolly/prefixes/<app_id>
     // This fixes the pending task to move WINEPREFIX to ~/.jolly/
     let prefix_dir = jolly_dir.join("prefixes").join(app_id);

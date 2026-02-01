@@ -1,0 +1,225 @@
+🚀 Starting JollyPad Launcher...
+🧹 Cleaning up old processes...
+👻 Starting catacomb...
+[2m2026-02-01T16:38:31.484463Z[0m [32m INFO[0m [2mcatacomb[0m[2m:[0m [2m53:[0m 🚀 Catacomb v1.0.6 starting...
+[2m2026-02-01T16:38:31.486610Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m83:[0m 🚀 Catacomb UDEV starting
+[2m2026-02-01T16:38:31.607168Z[0m [32m INFO[0m [2msmithay::backend::libinput[0m[2m:[0m [2m43:[0m Initializing a libinput backend
+[2m2026-02-01T16:38:31.609784Z[0m [32m INFO[0m [2msmithay::wayland::socket[0m[2m:[0m [2m82:[0m Created new socket [3mname[0m[2m=[0mSome("wayland-0")
+[2m2026-02-01T16:38:31.609835Z[0m [32m INFO[0m [2mcatacomb::state[0m[2m:[0m [2m202:[0m Wayland socket: wayland-0
+[2m2026-02-01T16:38:31.610797Z[0m [32m INFO[0m [1minput_seat[0m[1m{[0m[3mname[0m[2m=[0m"seat0"[1m}[0m[2m:[0m[1madd_keyboard[0m[1m{[0m[3mxkb_config[0m[2m=[0mXkbConfig { rules: "", model: "", layout: "", variant: "", options: None } [3mrepeat_delay[0m[2m=[0m200 [3mrepeat_rate[0m[2m=[0m25[1m}[0m[2m:[0m[1minput_keyboard[0m[2m:[0m [2msmithay::input::keyboard[0m[2m:[0m [2m672:[0m Initializing a xkbcommon handler with keymap query
+[2m2026-02-01T16:38:31.625642Z[0m [32m INFO[0m [1minput_seat[0m[1m{[0m[3mname[0m[2m=[0m"seat0"[1m}[0m[2m:[0m[1madd_keyboard[0m[1m{[0m[3mxkb_config[0m[2m=[0mXkbConfig { rules: "", model: "", layout: "", variant: "", options: None } [3mrepeat_delay[0m[2m=[0m200 [3mrepeat_rate[0m[2m=[0m25[1m}[0m[2m:[0m[1minput_keyboard[0m[2m:[0m [2msmithay::input::keyboard[0m[2m:[0m [2m680:[0m Loaded Keymap [3mname[0m[2m=[0m"English (US)"
+[2m2026-02-01T16:38:31.627589Z[0m [32m INFO[0m [1mnew[0m[1m{[0m[3mname[0m[2m=[0m"dummy-0" [3mphysical[0m[2m=[0mPhysicalProperties { size: Size<smithay::utils::geometry::Raw> { w: 0, h: 0 }, subpixel: Unknown, make: "dummy-0", model: "dummy-0", serial_number: "dummy-0" }[1m}[0m[2m:[0m [2msmithay::output[0m[2m:[0m [2m262:[0m Creating new Output [3mname[0m[2m=[0m"dummy-0"
+[2m2026-02-01T16:38:31.627622Z[0m [32m INFO[0m [2msmithay::wayland::output[0m[2m:[0m [2m208:[0m Creating new wl_output [3moutput[0m[2m=[0m"dummy-0"
+[2m2026-02-01T16:38:31.628511Z[0m [32m INFO[0m [2mcatacomb::state[0m[2m:[0m [2m334:[0m No configuration script found
+[2m2026-02-01T16:38:31.638948Z[0m [32m INFO[0m [2mgilrs_core::platform::platform::gamepad[0m[2m:[0m [2m635:[0m Gamepad /dev/input/event7 (Microsoft Xbox Series S|X Controller) connected.
+[2m2026-02-01T16:38:31.639605Z[0m [32m INFO[0m [2msmithay::xwayland::xserver[0m[2m:[0m [2m187:[0m spawning XWayland instance
+[2m2026-02-01T16:38:31.645009Z[0m [33m WARN[0m [2msmithay::backend::drm::device::fd[0m[2m:[0m [2m78:[0m Unable to become drm master, assuming unprivileged mode
+[2m2026-02-01T16:38:31.645029Z[0m [32m INFO[0m [2msmithay::backend::drm::device[0m[2m:[0m [2m193:[0m DrmDevice initializing
+[2m2026-02-01T16:38:31.836956Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m [2m176:[0m Successfully selected EGL platform: PLATFORM_GBM_KHR
+[2m2026-02-01T16:38:31.840005Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m [2m254:[0m EGL Initialized
+[2m2026-02-01T16:38:31.840016Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m [2m255:[0m EGL Version: (1, 5)
+[2m2026-02-01T16:38:31.840036Z[0m [32m INFO[0m [2msmithay::backend::egl::display[0m[2m:[0m [2m264:[0m Supported EGL display extensions: ["EGL_ANDROID_native_fence_sync", "EGL_EXT_buffer_age", "EGL_EXT_client_sync", "EGL_EXT_create_context_robustness", "EGL_EXT_image_dma_buf_import", "EGL_EXT_image_dma_buf_import_modifiers", "EGL_MESA_image_dma_buf_export", "EGL_EXT_output_base", "EGL_EXT_output_drm", "EGL_EXT_protected_content", "EGL_EXT_stream_consumer_egloutput", "EGL_EXT_stream_acquire_mode", "EGL_EXT_sync_reuse", "EGL_IMG_context_priority", "EGL_KHR_config_attribs", "EGL_KHR_create_context_no_error", "EGL_KHR_context_flush_control", "EGL_KHR_create_context", "EGL_KHR_fence_sync", "EGL_KHR_get_all_proc_addresses", "EGL_KHR_partial_update", "EGL_KHR_swap_buffers_with_damage", "EGL_KHR_no_config_context", "EGL_KHR_gl_colorspace", "EGL_KHR_gl_renderbuffer_image", "EGL_KHR_gl_texture_2D_image", "EGL_KHR_gl_texture_3D_image", "EGL_KHR_gl_texture_cubemap_image", "EGL_KHR_image", "EGL_KHR_image_base", "EGL_KHR_reusable_sync", "EGL_KHR_stream", "EGL_KHR_stream_attrib", "EGL_KHR_stream_consumer_gltexture", "EGL_KHR_stream_cross_process_fd", "EGL_KHR_stream_fifo", "EGL_KHR_stream_producer_eglsurface", "EGL_KHR_surfaceless_context", "EGL_KHR_wait_sync", "EGL_NV_nvrm_fence_sync", "EGL_NV_quadruple_buffer", "EGL_NV_stream_consumer_eglimage", "EGL_NV_stream_cross_display", "EGL_NV_stream_cross_object", "EGL_NV_stream_cross_process", "EGL_NV_stream_cross_system", "EGL_NV_stream_dma", "EGL_NV_stream_flush", "EGL_NV_stream_metadata", "EGL_NV_stream_remote", "EGL_NV_stream_reset", "EGL_NV_stream_socket", "EGL_NV_stream_socket_inet", "EGL_NV_stream_socket_unix", "EGL_NV_stream_sync", "EGL_NV_stream_fifo_next", "EGL_NV_stream_fifo_synchronous", "EGL_NV_stream_consumer_gltexture_yuv", "EGL_NV_stream_attrib", "EGL_NV_stream_origin", "EGL_NV_system_time", "EGL_NV_output_drm_flip_event", "EGL_NV_triple_buffer", "EGL_NV_robustness_video_memory_purge", "EGL_WL_bind_wayland_display", "EGL_WL_wayland_eglstream"]
+[2m2026-02-01T16:38:31.851728Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card1" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m94330214112081[1m}[0m[2m:[0m [2msmithay::backend::egl::context[0m[2m:[0m [2m337:[0m EGL context created [3mpriority[0m[2m=[0mSome(Medium)
+[2m2026-02-01T16:38:31.881129Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card1" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m94330214112081[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m [2m619:[0m Initializing OpenGL ES Renderer
+[2m2026-02-01T16:38:31.881138Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card1" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m94330214112081[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m [2m620:[0m GL Version: "OpenGL ES 3.2 NVIDIA 580.119.02"
+[2m2026-02-01T16:38:31.881141Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card1" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m94330214112081[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m [2m624:[0m GL Vendor: "NVIDIA Corporation"
+[2m2026-02-01T16:38:31.881143Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card1" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m94330214112081[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m [2m628:[0m GL Renderer: "NVIDIA GeForce RTX 4070 Ti SUPER/PCIe/SSE2"
+[2m2026-02-01T16:38:31.881149Z[0m [32m INFO[0m [1megl[0m[1m{[0m[3mnative[0m[2m=[0m"/dev/dri/card1" [3mplatform[0m[2m=[0m"PLATFORM_GBM_KHR" [3mversion[0m[2m=[0m(1, 5)[1m}[0m[2m:[0m[1megl_context[0m[1m{[0m[3mptr[0m[2m=[0m94330214112081[1m}[0m[2m:[0m[1mrenderer_gles2[0m[2m:[0m [2msmithay::backend::renderer::gles[0m[2m:[0m [2m632:[0m Supported GL Extensions: ["GL_EXT_base_instance", "GL_EXT_blend_func_extended", "GL_EXT_blend_minmax", "GL_EXT_buffer_storage", "GL_EXT_clear_texture", "GL_EXT_clip_control", "GL_EXT_clip_cull_distance", "GL_EXT_color_buffer_float", "GL_EXT_color_buffer_half_float", "GL_EXT_conservative_depth", "GL_EXT_copy_image", "GL_EXT_depth_clamp", "GL_EXT_debug_label", "GL_EXT_discard_framebuffer", "GL_EXT_disjoint_timer_query", "GL_EXT_draw_buffers_indexed", "GL_EXT_draw_elements_base_vertex", "GL_EXT_EGL_image_array", "GL_EXT_EGL_image_storage", "GL_EXT_EGL_image_external_wrap_modes", "GL_EXT_float_blend", "GL_EXT_frag_depth", "GL_EXT_geometry_point_size", "GL_EXT_geometry_shader", "GL_EXT_gpu_shader5", "GL_EXT_map_buffer_range", "GL_EXT_multi_draw_indirect", "GL_EXT_multisample_compatibility", "GL_EXT_multisampled_render_to_texture", "GL_EXT_multisampled_render_to_texture2", "GL_EXT_multiview_texture_multisample", "GL_EXT_multiview_timer_query", "GL_EXT_occlusion_query_boolean", "GL_EXT_polygon_offset_clamp", "GL_EXT_post_depth_coverage", "GL_EXT_primitive_bounding_box", "GL_EXT_raster_multisample", "GL_EXT_render_snorm", "GL_EXT_robustness", "GL_EXT_separate_shader_objects", "GL_EXT_shader_group_vote", "GL_EXT_shader_implicit_conversions", "GL_EXT_shader_integer_mix", "GL_EXT_shader_io_blocks", "GL_EXT_shader_non_constant_global_initializers", "GL_EXT_shader_texture_lod", "GL_EXT_shadow_samplers", "GL_EXT_sparse_texture", "GL_EXT_sparse_texture2", "GL_EXT_sRGB", "GL_EXT_sRGB_write_control", "GL_EXT_tessellation_point_size", "GL_EXT_tessellation_shader", "GL_EXT_texture_border_clamp", "GL_EXT_texture_buffer", "GL_EXT_texture_compression_bptc", "GL_EXT_texture_compression_dxt1", "GL_EXT_texture_compression_rgtc", "GL_EXT_texture_compression_s3tc", "GL_EXT_texture_cube_map_array", "GL_EXT_texture_filter_anisotropic", "GL_EXT_texture_filter_minmax", "GL_EXT_texture_format_BGRA8888", "GL_EXT_texture_mirror_clamp_to_edge", "GL_EXT_texture_norm16", "GL_EXT_texture_query_lod", "GL_EXT_texture_rg", "GL_EXT_texture_shadow_lod", "GL_EXT_texture_sRGB_R8", "GL_EXT_texture_sRGB_decode", "GL_EXT_texture_storage", "GL_EXT_texture_view", "GL_EXT_draw_transform_feedback", "GL_EXT_unpack_subimage", "GL_EXT_window_rectangles", "GL_KHR_context_flush_control", "GL_KHR_debug", "GL_EXT_memory_object", "GL_EXT_memory_object_fd", "GL_NV_memory_object_sparse", "GL_KHR_parallel_shader_compile", "GL_KHR_no_error", "GL_KHR_robust_buffer_access_behavior", "GL_KHR_robustness", "GL_EXT_semaphore", "GL_EXT_semaphore_fd", "GL_NV_timeline_semaphore", "GL_KHR_shader_subgroup", "GL_KHR_texture_compression_astc_ldr", "GL_KHR_texture_compression_astc_sliced_3d", "GL_KHR_texture_compression_astc_hdr", "GL_NV_bgr", "GL_NV_bindless_texture", "GL_NV_blend_equation_advanced", "GL_NV_blend_equation_advanced_coherent", "GL_NVX_blend_equation_advanced_multi_draw_buffers", "GL_NV_blend_minmax_factor", "GL_NV_clip_space_w_scaling", "GL_NV_compute_shader_derivatives", "GL_NV_conditional_render", "GL_NV_conservative_raster", "GL_NV_conservative_raster_pre_snap_triangles", "GL_NV_copy_buffer", "GL_NV_copy_image", "GL_NV_draw_buffers", "GL_NV_draw_instanced", "GL_NV_draw_texture", "GL_NV_draw_vulkan_image", "GL_NV_EGL_stream_consumer_external", "GL_NV_explicit_attrib_location", "GL_NV_fbo_color_attachments", "GL_NV_fill_rectangle", "GL_NV_fragment_coverage_to_color", "GL_NV_fragment_shader_barycentric", "GL_NV_fragment_shader_interlock", "GL_NV_framebuffer_blit", "GL_NV_framebuffer_mixed_samples", "GL_NV_framebuffer_multisample", "GL_NV_generate_mipmap_sRGB", "GL_NV_geometry_shader_passthrough", "GL_NV_instanced_arrays", "GL_NV_internalformat_sample_query", "GL_NV_gpu_shader5", "GL_NV_image_formats", "GL_NV_memory_attachment", "GL_NV_mesh_shader", "GL_NV_occlusion_query_samples", "GL_NV_non_square_matrices", "GL_NV_pack_subimage", "GL_NV_packed_float", "GL_NV_packed_float_linear", "GL_NV_path_rendering", "GL_NV_path_rendering_shared_edge", "GL_NV_pixel_buffer_object", "GL_NV_polygon_mode", "GL_NV_primitive_shading_rate", "GL_NV_read_buffer", "GL_NV_read_depth", "GL_NV_read_depth_stencil", "GL_NV_read_stencil", "GL_NV_representative_fragment_test", "GL_NV_sample_locations", "GL_NV_sample_mask_override_coverage", "GL_NV_scissor_exclusive", "GL_NV_shader_atomic_fp16_vector", "GL_NV_shader_noperspective_interpolation", "GL_NV_shader_subgroup_partitioned", "GL_NV_shader_texture_footprint", "GL_NV_shading_rate_image", "GL_NV_shadow_samplers_array", "GL_NV_shadow_samplers_cube", "GL_NV_sRGB_formats", "GL_NV_stereo_view_rendering", "GL_NV_texture_array", "GL_NV_texture_barrier", "GL_NV_texture_border_clamp", "GL_NV_texture_compression_latc", "GL_NV_texture_compression_s3tc", "GL_NV_texture_compression_s3tc_update", "GL_NV_texture_dirty_tile_map", "GL_NV_timer_query", "GL_NV_viewport_array", "GL_NV_viewport_array2", "GL_NV_viewport_swizzle", "GL_KHR_blend_equation_advanced", "GL_KHR_blend_equation_advanced_coherent", "GL_OES_compressed_ETC1_RGB8_texture", "GL_EXT_compressed_ETC1_RGB8_sub_texture", "GL_OES_depth24", "GL_OES_depth32", "GL_OES_depth_texture", "GL_OES_depth_texture_cube_map", "GL_OES_copy_image", "GL_OES_draw_buffers_indexed", "GL_OES_draw_elements_base_vertex", "GL_OES_texture_border_clamp", "GL_OES_tessellation_point_size", "GL_OES_tessellation_shader", "GL_OES_texture_buffer", "GL_OES_geometry_point_size", "GL_OES_geometry_shader", "GL_OES_gpu_shader5", "GL_OES_shader_io_blocks", "GL_OES_texture_view", "GL_OES_primitive_bounding_box", "GL_OES_EGL_image", "GL_OES_EGL_image_external", "GL_OES_EGL_image_external_essl3", "GL_OES_EGL_sync", "GL_OES_element_index_uint", "GL_OES_fbo_render_mipmap", "GL_OES_get_program_binary", "GL_OES_mapbuffer", "GL_OES_packed_depth_stencil", "GL_OES_rgb8_rgba8", "GL_EXT_read_format_bgra", "GL_OES_sample_shading", "GL_OES_sample_variables", "GL_OES_shader_image_atomic", "GL_OES_shader_multisample_interpolation", "GL_OES_standard_derivatives", "GL_OES_surfaceless_context", "GL_OES_texture_cube_map_array", "GL_OES_texture_npot", "GL_OES_texture_float", "GL_OES_texture_float_linear", "GL_OES_texture_half_float", "GL_OES_texture_half_float_linear", "GL_OES_texture_stencil8", "GL_OES_texture_storage_multisample_2d_array", "GL_OES_vertex_array_object", "GL_OES_vertex_half_float", "GL_OES_viewport_array", "GL_OVR_multiview", "GL_OVR_multiview2", "GL_OVR_multiview_multisampled_render_to_texture", "GL_ANDROID_extension_pack_es31a", ""]
+[2m2026-02-01T16:38:31.894352Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m506:[0m DEBUG: Total formats: 516, Linear formats: 0
+[2m2026-02-01T16:38:31.894359Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m508:[0m DEBUG: First format modifier: Unrecognized(216172782120099856)
+[2m2026-02-01T16:38:31.894361Z[0m [33m WARN[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m514:[0m ⚠️ No LINEAR/INVALID formats found! Falling back to using ALL available formats (AFBC might be enabled).
+[2m2026-02-01T16:38:31.894366Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m531:[0m Found 4 connectors
+[2m2026-02-01T16:38:31.894369Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m548:[0m 🔄 Attempt 1/60 Checking connectors...
+[2m2026-02-01T16:38:31.904884Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(128) (HDMIA) State: Connected
+[2m2026-02-01T16:38:31.904887Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m562:[0m       Found 5 modes. Max Width: 1024
+[2m2026-02-01T16:38:31.904888Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[0]: 1024x768 @ 0.06Hz
+[2m2026-02-01T16:38:31.904890Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[1]: 800x600 @ 0.07Hz
+[2m2026-02-01T16:38:31.904891Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[2]: 800x600 @ 0.06Hz
+[2m2026-02-01T16:38:31.904892Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[3]: 800x600 @ 0.06Hz
+[2m2026-02-01T16:38:31.904893Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[4]: 640x480 @ 0.06Hz
+[2m2026-02-01T16:38:31.904897Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m577:[0m       ✅ EDID Property detected on this connector.
+[2m2026-02-01T16:38:31.904903Z[0m [33m WARN[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m589:[0m       ⚠️ Connector connector::Handle(128) connected but max width 1024 < 1920. Waiting...
+[2m2026-02-01T16:38:31.905311Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(131) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:31.905591Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(135) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:31.905871Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(139) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:31.905873Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m610:[0m ⏳ Waiting for HDMI handshake / High-res modes... (Attempt 1/60)
+[2m2026-02-01T16:38:32.405971Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m548:[0m 🔄 Attempt 2/60 Checking connectors...
+[2m2026-02-01T16:38:32.415709Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(128) (HDMIA) State: Connected
+[2m2026-02-01T16:38:32.415722Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m562:[0m       Found 5 modes. Max Width: 1024
+[2m2026-02-01T16:38:32.415727Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[0]: 1024x768 @ 0.06Hz
+[2m2026-02-01T16:38:32.415734Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[1]: 800x600 @ 0.07Hz
+[2m2026-02-01T16:38:32.415739Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[2]: 800x600 @ 0.06Hz
+[2m2026-02-01T16:38:32.415743Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[3]: 800x600 @ 0.06Hz
+[2m2026-02-01T16:38:32.415747Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[4]: 640x480 @ 0.06Hz
+[2m2026-02-01T16:38:32.415764Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m577:[0m       ✅ EDID Property detected on this connector.
+[2m2026-02-01T16:38:32.415789Z[0m [33m WARN[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m589:[0m       ⚠️ Connector connector::Handle(128) connected but max width 1024 < 1920. Waiting...
+[2m2026-02-01T16:38:32.416292Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(131) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:32.416784Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(135) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:32.417273Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(139) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:32.417278Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m610:[0m ⏳ Waiting for HDMI handshake / High-res modes... (Attempt 2/60)
+🚀 Starting startup script...
+🚀 Jolly Startup running...
+[2m2026-02-01T16:38:32.917512Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m548:[0m 🔄 Attempt 3/60 Checking connectors...
+[2m2026-02-01T16:38:32.927868Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(128) (HDMIA) State: Connected
+[2m2026-02-01T16:38:32.927873Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m562:[0m       Found 5 modes. Max Width: 1024
+[2m2026-02-01T16:38:32.927874Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[0]: 1024x768 @ 0.06Hz
+[2m2026-02-01T16:38:32.927876Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[1]: 800x600 @ 0.07Hz
+[2m2026-02-01T16:38:32.927877Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[2]: 800x600 @ 0.06Hz
+[2m2026-02-01T16:38:32.927878Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[3]: 800x600 @ 0.06Hz
+[2m2026-02-01T16:38:32.927882Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[4]: 640x480 @ 0.06Hz
+[2m2026-02-01T16:38:32.927887Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m577:[0m       ✅ EDID Property detected on this connector.
+[2m2026-02-01T16:38:32.927893Z[0m [33m WARN[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m589:[0m       ⚠️ Connector connector::Handle(128) connected but max width 1024 < 1920. Waiting...
+[2m2026-02-01T16:38:32.928288Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(131) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:32.928566Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(135) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:32.928838Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(139) (DisplayPort) State: Disconnected
+[2m2026-02-01T16:38:32.928839Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m610:[0m ⏳ Waiting for HDMI handshake / High-res modes... (Attempt 3/60)
+[2m2026-02-01T16:38:33.429048Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m548:[0m 🔄 Attempt 4/60 Checking connectors...
+[2m2026-02-01T16:38:33.553910Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m559:[0m    🔌 Connector connector::Handle(128) (HDMIA) State: Connected
+[2m2026-02-01T16:38:33.553915Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m562:[0m       Found 25 modes. Max Width: 4096
+[2m2026-02-01T16:38:33.553916Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[0]: 3840x2160 @ 0.06Hz
+[2m2026-02-01T16:38:33.553918Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[1]: 4096x2160 @ 0.06Hz
+[2m2026-02-01T16:38:33.553919Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[2]: 4096x2160 @ 0.05Hz
+[2m2026-02-01T16:38:33.553920Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[3]: 4096x2160 @ 0.03Hz
+[2m2026-02-01T16:38:33.553921Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m567:[0m       Mode[4]: 4096x2160 @ 0.03Hz
+[2m2026-02-01T16:38:33.553927Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m577:[0m       ✅ EDID Property detected on this connector.
+[2m2026-02-01T16:38:33.553934Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m605:[0m ✅ Found valid connector with high-res modes!
+[2m2026-02-01T16:38:33.553936Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m669:[0m 📝 DRM Properties found on connector:
+[2m2026-02-01T16:38:33.553938Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - EDID
+[2m2026-02-01T16:38:33.553939Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - DPMS
+[2m2026-02-01T16:38:33.553941Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - link-status
+[2m2026-02-01T16:38:33.553942Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - non-desktop
+[2m2026-02-01T16:38:33.553943Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - TILE
+[2m2026-02-01T16:38:33.553944Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - CRTC_ID
+[2m2026-02-01T16:38:33.553945Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - Colorspace
+[2m2026-02-01T16:38:33.553946Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - HDR_OUTPUT_METADATA
+[2m2026-02-01T16:38:33.553947Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m672:[0m    - vrr_capable
+[2m2026-02-01T16:38:33.553963Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m688:[0m ✅ Set 'Colorspace' to 0 (Default)
+[2m2026-02-01T16:38:33.553970Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m853:[0m Candidate Modes for Attempt:
+[2m2026-02-01T16:38:33.553974Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#0] 3840x2160 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553976Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#1] 3840x2160 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553977Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#2] 3840x2160 @ 0.05Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553978Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#3] 3840x2160 @ 0.03Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553978Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#4] 3840x2160 @ 0.03Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553979Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#5] 3840x2160 @ 0.02Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553980Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#6] 4096x2160 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553981Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#7] 4096x2160 @ 0.05Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553982Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#8] 4096x2160 @ 0.03Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553983Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#9] 4096x2160 @ 0.03Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553984Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#10] 4096x2160 @ 0.02Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553985Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#11] 4096x2160 @ 0.02Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553986Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#12] 1920x1080 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553986Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#13] 1920x1080 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553987Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#14] 1920x1080 @ 0.05Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553988Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#15] 1280x1024 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553989Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#16] 1440x900 @ 0.06Hz (Flags: 0x6)
+[2m2026-02-01T16:38:33.553990Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#17] 1280x720 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553991Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#18] 1280x720 @ 0.05Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553992Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#19] 1024x768 @ 0.06Hz (Flags: 0xa)
+[2m2026-02-01T16:38:33.553992Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#20] 800x600 @ 0.06Hz (Flags: 0x5)
+[2m2026-02-01T16:38:33.553993Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#21] 720x576 @ 0.05Hz (Flags: 0xa)
+[2m2026-02-01T16:38:33.553994Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#22] 720x480 @ 0.06Hz (Flags: 0xa)
+[2m2026-02-01T16:38:33.553995Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#23] 640x480 @ 0.06Hz (Flags: 0xa)
+[2m2026-02-01T16:38:33.553996Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m855:[0m   [#24] 640x480 @ 0.06Hz (Flags: 0xa)
+[2m2026-02-01T16:38:33.554001Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m859:[0m 🚀 Attempting Mode #0: Mode { name: "3840x2160", clock: 594000, size: (3840, 2160), hsync: (4016, 4104, 4400), vsync: (2168, 2178, 2250), hskew: 0, vscan: 0, vrefresh: 60, mode_type: ModeTypeFlags(PREFERRED) }
+[2m2026-02-01T16:38:33.554532Z[0m [32m INFO[0m [1mdrm_atomic[0m[2m:[0m[1mcreate_surface[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(62) [3mmode[0m[2m=[0mMode { name: "3840x2160", clock: 594000, size: (3840, 2160), hsync: (4016, 4104, 4400), vsync: (2168, 2178, 2250), hskew: 0, vscan: 0, vrefresh: 60, mode_type: ModeTypeFlags(PREFERRED) } [3mconnectors[0m[2m=[0m[connector::Handle(128)][1m}[0m[2m:[0m[1mdrm_atomic[0m[1m{[0m[3mcrtc[0m[2m=[0mcrtc::Handle(62)[1m}[0m[2m:[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m [2m190:[0m Initializing drm surface (crtc::Handle(62):plane::Handle(51)) with mode Mode { name: "3840x2160", clock: 594000, size: (3840, 2160), hsync: (4016, 4104, 4400), vsync: (2168, 2178, 2250), hskew: 0, vscan: 0, vrefresh: 60, mode_type: ModeTypeFlags(PREFERRED) } and connectors [connector::Handle(128)]
+[2m2026-02-01T16:38:33.554623Z[0m [32m INFO[0m [1mnew[0m[1m{[0m[3mname[0m[2m=[0m"HDMIA" [3mphysical[0m[2m=[0mPhysicalProperties { size: Size<smithay::utils::geometry::Raw> { w: 1440, h: 810 }, subpixel: Unknown, make: "Catacomb", model: "Generic DRM", serial_number: "Unknown" }[1m}[0m[2m:[0m [2msmithay::output[0m[2m:[0m [2m262:[0m Creating new Output [3mname[0m[2m=[0m"HDMIA"
+[2m2026-02-01T16:38:33.554626Z[0m [32m INFO[0m [2msmithay::wayland::output[0m[2m:[0m [2m208:[0m Creating new wl_output [3moutput[0m[2m=[0m"HDMIA"
+[2m2026-02-01T16:38:33.559106Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m931:[0m ✅ Successfully created DrmCompositor with mode #0: Mode { name: "3840x2160", clock: 594000, size: (3840, 2160), hsync: (4016, 4104, 4400), vsync: (2168, 2178, 2250), hskew: 0, vscan: 0, vrefresh: 60, mode_type: ModeTypeFlags(PREFERRED) }
+[2m2026-02-01T16:38:33.559233Z[0m [32m INFO[0m [2mcatacomb::backend::udev[0m[2m:[0m [2m151:[0m ✅ Device added successfully, starting frame creation.
+[2m2026-02-01T16:38:33.566610Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m [2m768:[0m Adding connector: HDMIA
+[2m2026-02-01T16:38:33.566617Z[0m [32m INFO[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m [2m775:[0m Setting new mode: "3840x2160"
+[2m2026-02-01T16:38:33.570428Z[0m [33m WARN[0m [2msmithay::backend::drm::surface::atomic[0m[2m:[0m [2m803:[0m Failed to destroy old mode property blob: No such file or directory (os error 2)
+[2m2026-02-01T16:38:33.611049Z[0m [33m WARN[0m [2mcalloop::loop_logic[0m[2m:[0m [2m605:[0m Received an event for non-existent source [3mreg_token[0m[2m=[0mTokenInner { id: 10, version: 0, sub_id: 0 }
+Connected to Catacomb IPC.
+🔊 Setting up audio...
+Failed to unload module: Module module-raop-discover not loaded
+Failed to unload module: Module module-suspend-on-idle not loaded
+Found HDMI sink: alsa_output.pci-0000_01_00.1.hdmi-stereo
+✅ HDMI Audio set as default
+🔧 Unmuting HDMI switches on card 1...
+Simple mixer control 'IEC958',0
+  Capabilities: pswitch pswitch-joined
+  Playback channels: Mono
+  Mono: Playback [on]
+Simple mixer control 'IEC958',1
+  Capabilities: pswitch pswitch-joined
+  Playback channels: Mono
+  Mono: Playback [on]
+Simple mixer control 'IEC958',2
+  Capabilities: pswitch pswitch-joined
+  Playback channels: Mono
+  Mono: Playback [on]
+Simple mixer control 'IEC958',3
+  Capabilities: pswitch pswitch-joined
+  Playback channels: Mono
+  Mono: Playback [on]
+📝 Jolly Home logs will be written to: /home/jolly/jolly-home.log
+🏠 Spawning Jolly Home from: "/var/home/jolly/phs/jollypad/target/release/jolly-home"
+✅ Jolly Startup completed.
+[2m2026-02-01T16:38:40.193231Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m485:[0m toggle_app: Request=AppIdMatcher { variant: Regex(Regex("JollyPad-Overlay")), base: "JollyPad-Overlay" }, ActiveTitle='JollyPad-Desktop', ActiveID='', IsActive=false
+[2m2026-02-01T16:38:40.193276Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("JollyPad-Overlay")), base: "JollyPad-Overlay" }
+[2m2026-02-01T16:38:40.193284Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m472:[0m focus_app: No matching window found.
+DEBUG: jolly-nav starting...
+[2m2026-02-01T16:38:41.134137Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m485:[0m toggle_app: Request=AppIdMatcher { variant: Regex(Regex("JollyPad-Overlay")), base: "JollyPad-Overlay" }, ActiveTitle='JollyPad-Overlay', ActiveID='', IsActive=true
+[2m2026-02-01T16:38:41.134189Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m489:[0m toggle_app: Hiding app. Layout count: 2
+[2m2026-02-01T16:38:41.134201Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m493:[0m   Layout 0: Primary='JollyPad-Desktop', Secondary='None'
+[2m2026-02-01T16:38:41.134209Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m493:[0m   Layout 1: Primary='JollyPad-Overlay', Secondary='None'
+[2m2026-02-01T16:38:41.134264Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m534:[0m toggle_app: Found parent layout ID LayoutId(1), switching back to it.
+CatacombClient: Sent ExecOrFocus: /var/home/jolly/phs/jollypad/target/release/jolly-settings
+[2m2026-02-01T16:38:41.184846Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("")), base: "" }
+[2m2026-02-01T16:38:41.184888Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m472:[0m focus_app: No matching window found.
+[2m2026-02-01T16:38:41.184997Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("")), base: "" }
+[2m2026-02-01T16:38:41.185015Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m472:[0m focus_app: No matching window found.
+[2m2026-02-01T16:38:41.185031Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m663:[0m LAUNCH: exec_spawned command='/var/home/jolly/phs/jollypad/target/release/jolly-settings' key='Some("/var/home/jolly/phs/jollypad/target/release/jolly-settings")' card_id='Some("nav:f24de025cd60ad4a")' pgid='None'
+[2m2026-02-01T16:38:41.188389Z[0m [32m INFO[0m [2mcatacomb::backend::ipc[0m[2m:[0m [2m169:[0m IPC ExecOrFocus spawned: /var/home/jolly/phs/jollypad/target/release/jolly-settings
+[2m2026-02-01T16:38:41.252632Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m732:[0m LAUNCH: window_created title='' xdg_app_id=None app_id=None final='' elapsed=67ms command='/var/home/jolly/phs/jollypad/target/release/jolly-settings'
+[2m2026-02-01T16:38:41.252984Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1489:[0m Focus switch: OldRole=Some("home") NewRole=Some("settings") Delay=true
+[2m2026-02-01T16:38:41.252987Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1497:[0m Delayed resume for pgid 2127 (transient system role)
+[2m2026-02-01T16:38:41.353009Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1566:[0m Executed delayed resume for pgid 2127
+[2m2026-02-01T16:38:44.365679Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m485:[0m toggle_app: Request=AppIdMatcher { variant: Regex(Regex("JollyPad-Overlay")), base: "JollyPad-Overlay" }, ActiveTitle='JollyPad-Settings', ActiveID='', IsActive=false
+[2m2026-02-01T16:38:44.365724Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("JollyPad-Overlay")), base: "JollyPad-Overlay" }
+[2m2026-02-01T16:38:44.365735Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m450:[0m focus_app: Switching to Overlay (position LayoutPosition { index: 1, secondary: false }). Pushing active to parent.
+[2m2026-02-01T16:38:44.365799Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1417:[0m Scheduled suspend for pgid 2127 (100ms delay)
+[2m2026-02-01T16:38:44.479652Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1127:[0m Executing delayed suspend for pgid 2127
+[2m2026-02-01T16:38:45.435542Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m485:[0m toggle_app: Request=AppIdMatcher { variant: Regex(Regex("JollyPad-Overlay")), base: "JollyPad-Overlay" }, ActiveTitle='JollyPad-Overlay', ActiveID='', IsActive=true
+[2m2026-02-01T16:38:45.435601Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m489:[0m toggle_app: Hiding app. Layout count: 3
+[2m2026-02-01T16:38:45.435610Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m493:[0m   Layout 0: Primary='JollyPad-Desktop', Secondary='None'
+[2m2026-02-01T16:38:45.435615Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m493:[0m   Layout 1: Primary='JollyPad-Overlay', Secondary='None'
+[2m2026-02-01T16:38:45.435621Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m493:[0m   Layout 2: Primary='JollyPad-Settings', Secondary='None'
+[2m2026-02-01T16:38:45.435758Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m534:[0m toggle_app: Found parent layout ID LayoutId(3), switching back to it.
+[2m2026-02-01T16:38:45.435807Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1489:[0m Focus switch: OldRole=Some("nav") NewRole=Some("settings") Delay=true
+[2m2026-02-01T16:38:45.435815Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1497:[0m Delayed resume for pgid 2127 (transient system role)
+[2m2026-02-01T16:38:45.535918Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("^(JollyPad-Desktop|jolly-home|JollyPad-Launcher)$")), base: "^(JollyPad-Desktop|jolly-home|JollyPad-Launcher)$" }
+[2m2026-02-01T16:38:45.536018Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m465:[0m focus_app: Switching to normal app (position LayoutPosition { index: 0, secondary: false }). Clearing parents.
+[2m2026-02-01T16:38:45.536082Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1566:[0m Executed delayed resume for pgid 2127
+[2m2026-02-01T16:38:45.536110Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1417:[0m Scheduled suspend for pgid 2127 (100ms delay)
+[2m2026-02-01T16:38:45.640115Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1127:[0m Executing delayed suspend for pgid 2127
+[2m2026-02-01T16:38:47.792664Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("com.localhost.it-takes-two")), base: "com.localhost.it-takes-two" }
+[2m2026-02-01T16:38:47.792713Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m472:[0m focus_app: No matching window found.
+[2m2026-02-01T16:38:47.792804Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("")), base: "" }
+[2m2026-02-01T16:38:47.792812Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m472:[0m focus_app: No matching window found.
+[2m2026-02-01T16:38:47.792862Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m393:[0m focus_app: Request to focus AppIdMatcher { variant: Regex(Regex("")), base: "" }
+[2m2026-02-01T16:38:47.792869Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m472:[0m focus_app: No matching window found.
+[2m2026-02-01T16:38:47.792876Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m663:[0m LAUNCH: exec_spawned command='PULSE_LATENCY_MSEC=60 PROTONPATH='Proton-GE Latest' SDL_AUDIODRIVER=pulseaudio WINEPREFIX=/home/jolly/.jolly/prefixes/com.localhost.it-takes-two PROTON_EAC_RUNTIME=/home/jolly/.jolly/components/eac PROTON_BATTLEYE_RUNTIME=/home/jolly/.jolly/components/be STEAM_COMPAT_TOOLS_PATHS=/home/jolly/.jolly/runners WINE_FULLSCREEN_FSR=0 /home/jolly/.jolly/tools/umu-run '/home/jolly/games/It Takes Two/Nuts/Binaries/Win64/ItTakesTwo.exe'' key='Some("PULSE_LATENCY_MSEC=60")' card_id='Some("card:ea372c5f363b1925")' pgid='None'
+[2m2026-02-01T16:38:47.795826Z[0m [32m INFO[0m [2mcatacomb::backend::ipc[0m[2m:[0m [2m169:[0m IPC ExecOrFocus spawned: PULSE_LATENCY_MSEC=60 PROTONPATH='Proton-GE Latest' SDL_AUDIODRIVER=pulseaudio WINEPREFIX=/home/jolly/.jolly/prefixes/com.localhost.it-takes-two PROTON_EAC_RUNTIME=/home/jolly/.jolly/components/eac PROTON_BATTLEYE_RUNTIME=/home/jolly/.jolly/components/be STEAM_COMPAT_TOOLS_PATHS=/home/jolly/.jolly/runners WINE_FULLSCREEN_FSR=0 /home/jolly/.jolly/tools/umu-run '/home/jolly/games/It Takes Two/Nuts/Binaries/Win64/ItTakesTwo.exe'
+INFO: umu-launcher version 1.3.0 (3.14.2 (main, Dec  5 2025, 00:00:00) [GCC 15.2.1 20251111 (Red Hat 15.2.1-4)])
+INFO: No GAMEID set, using umu-default
+INFO: steamrt3 is up to date
+pressure-vessel-wrap[2153]: W: Cannot determine ld.so for i386-linux-gnu: Failed to execute child process “/var/home/jolly/.local/share/umu/steamrt3/pressure-vessel/libexec/steam-runtime-tools-0/i386-linux-gnu-capsule-capture-libs” (No such file or directory)
+pressure-vessel-wrap[2153]: W: Not sharing path STEAM_COMPAT_LIBRARY_PATHS="...:/var:..." with container because "/var/cache/ldconfig" is reserved by the container framework
+ProtonFixes[2223] INFO: Running protonfixes on "GE-Proton10-29-1-g43b24f58", build at 2026-01-24 14:38:37+00:00.
+ProtonFixes[2223] INFO: Running checks
+ProtonFixes[2223] INFO: All checks successful
+ProtonFixes[2223] WARN: Game title not found in CSV
+ProtonFixes[2223] INFO: Non-steam game UNKNOWN (umu-default)
+ProtonFixes[2223] INFO: No store specified, using UMU database
+ProtonFixes[2223] INFO: Using global defaults for UNKNOWN (umu-default)
+ProtonFixes[2223] INFO: Non-steam game UNKNOWN (umu-default)
+ProtonFixes[2223] INFO: No store specified, using UMU database
+ProtonFixes[2223] INFO: No global protonfix found for UNKNOWN (umu-default)
+[2m2026-02-01T16:38:50.033661Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m732:[0m LAUNCH: window_created title='' xdg_app_id=None app_id=None final='' elapsed=2240ms command='PULSE_LATENCY_MSEC=60 PROTONPATH='Proton-GE Latest' SDL_AUDIODRIVER=pulseaudio WINEPREFIX=/home/jolly/.jolly/prefixes/com.localhost.it-takes-two PROTON_EAC_RUNTIME=/home/jolly/.jolly/components/eac PROTON_BATTLEYE_RUNTIME=/home/jolly/.jolly/components/be STEAM_COMPAT_TOOLS_PATHS=/home/jolly/.jolly/runners WINE_FULLSCREEN_FSR=0 /home/jolly/.jolly/tools/umu-run '/home/jolly/games/It Takes Two/Nuts/Binaries/Win64/ItTakesTwo.exe''
+[2m2026-02-01T16:38:50.033822Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1489:[0m Focus switch: OldRole=Some("home") NewRole=None Delay=true
+[2m2026-02-01T16:38:50.033825Z[0m [32m INFO[0m [2mcatacomb::shell::windows[0m[2m:[0m [2m1497:[0m Delayed resume for pgid 2148 (transient system role)
+Proton: /var/home/jolly/games/It Takes Two/Nuts/Binaries/Win64/ItTakesTwo.exe
+Proton: Executable a unix path, launching with /unix option.
+fsync: up and running.

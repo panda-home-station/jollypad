@@ -21,10 +21,82 @@ pub fn run() -> Result<()> {
     // 3. Settings
     setup_settings()?;
 
-    // 4. Spawn background apps
+    // 4. Audio Setup
+    setup_audio()?;
+
+    // 5. Spawn background apps
     spawn_apps()?;
 
     println!("✅ Jolly Startup completed.");
+    Ok(())
+}
+
+fn setup_audio() -> Result<()> {
+    println!("🔊 Setting up audio...");
+    
+    // Unload modules that cause issues (RAOP casting, Suspend)
+    let _ = Command::new("pactl").args(&["unload-module", "module-raop-discover"]).status();
+    let _ = Command::new("pactl").args(&["unload-module", "module-suspend-on-idle"]).status();
+    
+    // Retry finding HDMI sink for up to 5 seconds
+    let script = "
+        for i in {1..10}; do
+            sink=$(pactl list short sinks | grep 'hdmi' | cut -f2 | head -n1)
+            if [ ! -z \"$sink\" ]; then
+                pactl set-default-sink \"$sink\"
+                echo \"Found HDMI sink: $sink\"
+                exit 0
+            fi
+            sleep 0.5
+        done
+        echo \"No HDMI sink found\"
+        exit 1
+    ";
+    
+    let status = Command::new("bash")
+        .args(&["-c", script])
+        .status()
+        .context("Failed to execute audio setup script")?;
+
+    if status.success() {
+        println!("✅ HDMI Audio set as default");
+    } else {
+        println!("⚠️ Failed to find HDMI Audio sink");
+    }
+    
+    // Force unmute all HDMI IEC958 switches on NVidia card (card 1 usually)
+    // We try to find the card index for "NVidia" just in case
+    let card_script = "aplay -l | grep 'NVidia' | head -n1 | cut -d' ' -f2 | tr -d ':'";
+    let card_output = Command::new("bash").args(&["-c", card_script]).output();
+    
+    if let Ok(output) = card_output {
+        let card = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if !card.is_empty() {
+             println!("🔧 Unmuting HDMI switches on card {}...", card);
+             let _ = Command::new("amixer")
+                .args(&["-c", &card, "sset", "IEC958", "on"])
+                .status();
+             let _ = Command::new("amixer")
+                .args(&["-c", &card, "sset", "IEC958,1", "on"])
+                .status();
+             let _ = Command::new("amixer")
+                .args(&["-c", &card, "sset", "IEC958,2", "on"])
+                .status();
+             let _ = Command::new("amixer")
+                .args(&["-c", &card, "sset", "IEC958,3", "on"])
+                .status();
+        }
+    }
+
+    // Set volume to 100% and unmute
+    let _ = Command::new("pactl")
+        .args(&["set-sink-volume", "@DEFAULT_SINK@", "100%"])
+        .status();
+
+    let _ = Command::new("pactl")
+        .args(&["set-sink-mute", "@DEFAULT_SINK@", "0"])
+        .status();
+
     Ok(())
 }
 
@@ -142,7 +214,7 @@ fn setup_key_bindings() -> Result<()> {
         trigger: KeyTrigger::Repeat,
         keys: Keysyms::from_str("XF86AudioRaiseVolume")?,
         program: "pactl".to_string(),
-        arguments: vec!["set-sink-volume".to_string(), "0".to_string(), "+5%".to_string()],
+        arguments: vec!["set-sink-volume".to_string(), "@DEFAULT_SINK@".to_string(), "+5%".to_string()],
     })?;
     
     send(IpcMessage::BindKey {
@@ -151,7 +223,7 @@ fn setup_key_bindings() -> Result<()> {
         trigger: KeyTrigger::Repeat,
         keys: Keysyms::from_str("XF86AudioLowerVolume")?,
         program: "pactl".to_string(),
-        arguments: vec!["set-sink-volume".to_string(), "0".to_string(), "-5%".to_string()],
+        arguments: vec!["set-sink-volume".to_string(), "@DEFAULT_SINK@".to_string(), "-5%".to_string()],
     })?;
 
     Ok(())
