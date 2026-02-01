@@ -1,5 +1,6 @@
+apps/catacomb
+assets
+
 tmp
 target
-jolly
-apps/catacomb
 log

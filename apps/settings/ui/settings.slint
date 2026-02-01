@@ -1,0 +1,579 @@
+import { Theme } from "styles.slint";
+
+component SettingItem inherits Rectangle {
+    in property <string> label;
+    in property <string> value;
+    in property <bool> focused;
+    callback clicked;
+    
+    height: 60px;
+    background: focused ? Theme.card-hover : rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    
+    TouchArea {
+        clicked => { root.clicked(); }
+    }
+    
+    HorizontalLayout {
+        padding-left: 20px;
+        padding-right: 20px;
+        Text {
+            text: root.label;
+            color: Theme.text-color;
+            vertical-alignment: center;
+            font-size: 20px;
+            horizontal-stretch: 1;
+        }
+        Text {
+            text: root.value;
+            color: rgba(255, 255, 255, 0.6);
+            vertical-alignment: center;
+            font-size: 18px;
+        }
+    }
+}
+
+export component SettingsWindow inherits Window {
+    callback close-requested();
+    in-out property <int> selected-index: 0; // Sidebar index
+    
+    // Display Settings Data
+    in property <string> current-resolution: "1920x1080";
+    in property <string> current-scale: "100%";
+    in property <[string]> scale-options; // ["100%", "125%", "150%"]
+    in property <[string]> resolution-options;
+    callback apply-scale(int);
+    callback apply-resolution(int);
+    
+    // Focus State
+    property <bool> sidebar-focus: true;
+    property <int> content-index: 0;
+    
+    // Popup State
+    property <bool> show-scale-popup: false;
+    in-out property <int> popup-index: 0;
+    property <bool> show-resolution-popup: false;
+    in-out property <int> resolution-popup-index: 0;
+    property <length> res-viewport-y: 0px;
+
+    // Confirmation Popup State
+    in-out property <bool> show-confirmation-popup: false;
+    in-out property <int> confirmation-index: 0;
+    in property <int> countdown-seconds: 15;
+    callback confirm-resolution();
+    callback revert-resolution();
+
+    no-frame: true;
+    background: #1e1e1e;
+    title: "JollyPad-Settings";
+    forward-focus: main-scope;
+
+    main-scope := FocusScope {
+        key-pressed(event) => {
+            // Confirmation Popup Navigation
+            if (root.show-confirmation-popup) {
+                if (event.text == Key.LeftArrow) {
+                    root.confirmation-index = 0;
+                    return accept;
+                }
+                if (event.text == Key.RightArrow) {
+                    root.confirmation-index = 1;
+                    return accept;
+                }
+                if (event.text == Key.Return) {
+                    if (root.confirmation-index == 0) {
+                        root.confirm-resolution();
+                    } else {
+                        root.revert-resolution();
+                    }
+                    return accept;
+                }
+                if (event.text == Key.Escape) {
+                    root.revert-resolution();
+                    return accept;
+                }
+                return accept; // Block all other input
+            }
+
+            // Popup Navigation (Resolution)
+            if (root.show-resolution-popup) {
+                if (event.text == Key.UpArrow) {
+                    if (root.resolution-popup-index > 0) { 
+                        root.resolution-popup-index -= 1; 
+                        if (root.resolution-popup-index * 60px < -root.res-viewport-y) {
+                            root.res-viewport-y = -root.resolution-popup-index * 60px;
+                        }
+                    }
+                    return accept;
+                }
+                if (event.text == Key.DownArrow) {
+                    if (root.resolution-popup-index < root.resolution-options.length - 1) { 
+                        root.resolution-popup-index += 1; 
+                        if ((root.resolution-popup-index + 1) * 60px > -root.res-viewport-y + 280px) {
+                             root.res-viewport-y = 280px - (root.resolution-popup-index + 1) * 60px;
+                        }
+                    }
+                    return accept;
+                }
+                if (event.text == Key.Return) {
+                    root.apply-resolution(root.resolution-popup-index);
+                    root.show-resolution-popup = false;
+                    root.show-confirmation-popup = true;
+                    root.confirmation-index = 0;
+                    return accept;
+                }
+                if (event.text == Key.Escape) {
+                    root.show-resolution-popup = false;
+                    return accept;
+                }
+                return accept;
+            }
+
+            // Popup Navigation (Scale)
+            if (root.show-scale-popup) {
+                if (event.text == Key.UpArrow) {
+                    if (root.popup-index > 0) { root.popup-index -= 1; }
+                    return accept;
+                }
+                if (event.text == Key.DownArrow) {
+                    if (root.popup-index < root.scale-options.length - 1) { root.popup-index += 1; }
+                    return accept;
+                }
+                if (event.text == Key.Return) {
+                    root.apply-scale(root.popup-index);
+                    root.show-scale-popup = false;
+                    return accept;
+                }
+                if (event.text == Key.Escape) {
+                    root.show-scale-popup = false;
+                    return accept;
+                }
+                return accept; // Consume other keys in popup
+            }
+        
+            // Sidebar Navigation
+            if (root.sidebar-focus) {
+                if (event.text == Key.UpArrow) {
+                    if (root.selected-index > 0) { root.selected-index -= 1; }
+                    return accept;
+                }
+                if (event.text == Key.DownArrow) {
+                    if (root.selected-index < 5) { root.selected-index += 1; }
+                    return accept;
+                }
+                if (event.text == Key.RightArrow || event.text == Key.Return) {
+                    if (root.selected-index == 5) { // Close button
+                         root.close-requested();
+                    } else {
+                         root.sidebar-focus = false;
+                         root.content-index = 0;
+                    }
+                    return accept;
+                }
+                if (event.text == Key.Escape) {
+                    root.close-requested();
+                    return accept;
+                }
+            } 
+            // Content Navigation
+            else {
+                if (event.text == Key.UpArrow) {
+                    if (root.content-index > 0) { root.content-index -= 1; }
+                    return accept;
+                }
+                if (event.text == Key.DownArrow) {
+                    // Adjust max index based on active page
+                    if (root.selected-index == 2 && root.content-index < 1) { root.content-index += 1; }
+                    return accept;
+                }
+                if (event.text == Key.LeftArrow) {
+                    root.sidebar-focus = true;
+                    return accept;
+                }
+                if (event.text == Key.Escape) {
+                    root.sidebar-focus = true;
+                    return accept;
+                }
+                if (event.text == Key.Return) {
+                    // Activate item
+                    if (root.selected-index == 2) {
+                        if (root.content-index == 0) { // Resolution
+                            root.show-resolution-popup = true;
+                        }
+                        if (root.content-index == 1) { // Scale
+                            root.show-scale-popup = true;
+                            // Initialize popup index? logic needed in rust or here
+                        }
+                    }
+                    return accept;
+                }
+            }
+            return reject;
+        }
+    
+        HorizontalLayout {
+            padding: Theme.padding;
+            spacing: Theme.padding;
+            
+            // Sidebar
+            Rectangle {
+                width: 260px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: Theme.border-radius;
+                
+                VerticalLayout {
+                    padding: 15px;
+                    spacing: 5px;
+                    
+                    Text {
+                        text: "Settings";
+                        font-size: 28px;
+                        color: Theme.text-color;
+                        height: 50px;
+                        vertical-alignment: center;
+                    }
+                    
+                    for category[i] in ["Network", "Bluetooth", "Display", "Audio", "About"] : Rectangle {
+                        height: 50px;
+                        background: (root.sidebar-focus && i == root.selected-index) ? Theme.card-hover : 
+                                    (!root.sidebar-focus && i == root.selected-index) ? rgba(255, 255, 255, 0.1) : transparent;
+                        border-radius: 8px;
+                        
+                        TouchArea {
+                            clicked => { 
+                                root.selected-index = i; 
+                                root.sidebar-focus = true;
+                            }
+                        }
+                        
+                        Text {
+                            x: 15px;
+                            text: category;
+                            color: Theme.text-color;
+                            vertical-alignment: center;
+                            font-size: 20px;
+                        }
+                    }
+                    
+                    Rectangle { vertical-stretch: 1; }
+                    
+                    // Back/Close button in sidebar bottom
+                    Rectangle {
+                        height: 50px;
+                        background: (root.sidebar-focus && root.selected-index == 5) ? Theme.card-hover : Theme.card-bg;
+                        border-radius: 8px;
+                        TouchArea {
+                             clicked => { root.close-requested(); }
+                        }
+                        Text {
+                            text: "Close";
+                            color: Theme.text-color;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                            font-size: 20px;
+                        }
+                    }
+                }
+            }
+            
+            // Main Content
+            Rectangle {
+                background: Theme.card-bg;
+                border-radius: Theme.border-radius;
+                clip: true;
+                
+                VerticalLayout {
+                    padding: 40px;
+                    spacing: 30px;
+                    
+                    Text {
+                        text: root.selected-index == 0 ? "Network Settings" :
+                              root.selected-index == 1 ? "Bluetooth Settings" :
+                              root.selected-index == 2 ? "Display Settings" :
+                              root.selected-index == 3 ? "Audio Settings" : "About JollyPad";
+                        font-size: 32px;
+                        color: Theme.text-color;
+                    }
+                    
+                    Rectangle { height: 1px; background: rgba(255, 255, 255, 0.1); }
+                    
+                    if (root.selected-index != 2) : Text {
+                        text: "Content for this section is under construction.";
+                        color: rgba(255, 255, 255, 0.6);
+                        font-size: 20px;
+                        wrap: word-wrap;
+                    }
+                    
+                    // Display Settings Content
+                    if (root.selected-index == 2) : VerticalLayout {
+                        spacing: 16px;
+                        
+                        SettingItem {
+                            label: "Resolution";
+                            value: root.current-resolution;
+                            focused: !root.sidebar-focus && root.content-index == 0;
+                            clicked => { 
+                                root.sidebar-focus = false; 
+                                root.content-index = 0; 
+                            }
+                        }
+                        
+                        SettingItem {
+                            label: "Scale";
+                            value: root.current-scale;
+                            focused: !root.sidebar-focus && root.content-index == 1;
+                            clicked => { 
+                                root.sidebar-focus = false; 
+                                root.content-index = 1; 
+                                root.show-scale-popup = true;
+                            }
+                        }
+
+                        Text {
+                            text: "Select Scale to adjust UI size.";
+                            color: rgba(255,255,255,0.4);
+                            font-size: 16px;
+                        }
+                    }
+                    
+                    Rectangle { vertical-stretch: 1; }
+                }
+            }
+        }
+
+        // Popup Overlay
+        if (root.show-scale-popup) : Rectangle {
+            background: rgba(0, 0, 0, 0.8);
+            TouchArea {
+                clicked => { root.show-scale-popup = false; }
+            }
+            
+            Rectangle {
+                width: 400px;
+                height: 400px;
+                background: #252525;
+                border-radius: 12px;
+                border-width: 1px;
+                border-color: rgba(255, 255, 255, 0.1);
+                clip: true;
+                
+                VerticalLayout {
+                    padding: 20px;
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "Select Scale";
+                        font-size: 24px;
+                        color: Theme.text-color;
+                        horizontal-alignment: center;
+                    }
+                    
+                    Rectangle { height: 1px; background: rgba(255, 255, 255, 0.1); }
+                    
+                    for option[i] in root.scale-options : Rectangle {
+                        height: 50px;
+                        background: i == root.popup-index ? Theme.card-hover : transparent;
+                        border-radius: 8px;
+                        
+                        TouchArea {
+                            clicked => { 
+                                root.popup-index = i;
+                                root.apply-scale(i);
+                                root.show-scale-popup = false;
+                            }
+                        }
+                        
+                        HorizontalLayout {
+                            padding-left: 20px;
+                            Text {
+                                text: option;
+                                color: Theme.text-color;
+                                vertical-alignment: center;
+                                font-size: 20px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Resolution Popup Overlay
+        if (root.show-resolution-popup) : Rectangle {
+            background: rgba(0, 0, 0, 0.8);
+            TouchArea {
+                clicked => { root.show-resolution-popup = false; }
+            }
+            
+            Rectangle {
+                width: 400px;
+                height: 400px;
+                background: #252525;
+                border-radius: 12px;
+                border-width: 1px;
+                border-color: rgba(255, 255, 255, 0.1);
+                clip: true;
+                
+                VerticalLayout {
+                    padding: 20px;
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "Select Resolution";
+                        font-size: 24px;
+                        color: Theme.text-color;
+                        horizontal-alignment: center;
+                    }
+                    
+                    Rectangle { height: 1px; background: rgba(255, 255, 255, 0.1); }
+                    
+                    Flickable {
+                        vertical-stretch: 1;
+                        viewport-y <=> root.res-viewport-y;
+                        viewport-height: root.resolution-options.length * 60px;
+                        
+                        VerticalLayout {
+                            width: parent.width;
+                            alignment: start;
+                            spacing: 10px;
+
+                            for option[i] in root.resolution-options : Rectangle {
+                                height: 50px;
+                                background: i == root.resolution-popup-index ? Theme.card-hover : transparent;
+                                border-radius: 8px;
+                                
+                                TouchArea {
+                                    clicked => { 
+                                        root.resolution-popup-index = i;
+                                        root.apply-resolution(i);
+                                        root.show-resolution-popup = false;
+                                    }
+                                }
+                                
+                                HorizontalLayout {
+                                    alignment: center;
+                                    Text {
+                                        text: option;
+                                        color: Theme.text-color;
+                                        vertical-alignment: center;
+                                        font-size: 20px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Confirmation Popup Overlay
+        if (root.show-confirmation-popup) : Rectangle {
+            background: rgba(0, 0, 0, 0.8);
+            TouchArea {} // Block clicks
+            Rectangle {
+                width: 450px;
+                height: 250px;
+                background: #252525;
+                border-radius: 12px;
+                border-width: 1px;
+                border-color: rgba(255, 255, 255, 0.1);
+                VerticalLayout {
+                    padding: 30px;
+                    spacing: 20px;
+                    alignment: center;
+                    Text {
+                        text: "Keep these display settings?";
+                        font-size: 24px;
+                        color: Theme.text-color;
+                        horizontal-alignment: center;
+                    }
+                    Text {
+                        text: "Reverting in " + root.countdown-seconds + " seconds";
+                        font-size: 18px;
+                        color: rgba(255, 255, 255, 0.6);
+                        horizontal-alignment: center;
+                    }
+                    HorizontalLayout {
+                        spacing: 20px;
+                        alignment: center;
+                        Rectangle {
+                            width: 180px;
+                            height: 50px;
+                            background: root.confirmation-index == 0 ? Theme.card-hover : rgba(255, 255, 255, 0.08);
+                            border-width: root.confirmation-index == 0 ? 0px : 1px;
+                            border-color: rgba(255, 255, 255, 0.25);
+                            border-radius: 8px;
+                            TouchArea {
+                                clicked => { root.confirm-resolution(); }
+                            }
+                            HorizontalLayout {
+                                spacing: 10px;
+                                alignment: center;
+                                Rectangle {
+                                    y: (parent.height - self.height) / 2;
+                                    width: 24px;
+                                    height: 24px;
+                                    border-radius: 12px;
+                                    background: rgba(255, 255, 255, 0.06);
+                                    border-width: 1px;
+                                    border-color: rgba(255, 255, 255, 0.3);
+                                    Text {
+                                        text: "A";
+                                        color: rgba(255, 255, 255, 0.9);
+                                        horizontal-alignment: center;
+                                        vertical-alignment: center;
+                                        font-size: 14px;
+                                    }
+                                }
+                                Text {
+                                    text: "Keep Change";
+                                    color: Theme.text-color;
+                                    vertical-alignment: center;
+                                    horizontal-alignment: center;
+                                    font-size: 18px;
+                                }
+                            }
+                        }
+                        Rectangle {
+                            width: 180px;
+                            height: 50px;
+                            background: root.confirmation-index == 1 ? Theme.card-hover : rgba(255, 255, 255, 0.08);
+                            border-width: root.confirmation-index == 1 ? 0px : 1px;
+                            border-color: rgba(255, 255, 255, 0.25);
+                            border-radius: 8px;
+                            TouchArea {
+                                clicked => { root.revert-resolution(); }
+                            }
+                            HorizontalLayout {
+                                spacing: 10px;
+                                alignment: center;
+                                Rectangle {
+                                    y: (parent.height - self.height) / 2;
+                                    width: 24px;
+                                    height: 24px;
+                                    border-radius: 12px;
+                                    background: rgba(255, 255, 255, 0.06);
+                                    border-width: 1px;
+                                    border-color: rgba(255, 255, 255, 0.3);
+                                    Text {
+                                        text: "B";
+                                        color: rgba(255, 255, 255, 0.9);
+                                        horizontal-alignment: center;
+                                        vertical-alignment: center;
+                                        font-size: 14px;
+                                    }
+                                }
+                                Text {
+                                    text: "Revert";
+                                    color: Theme.text-color;
+                                    vertical-alignment: center;
+                                    horizontal-alignment: center;
+                                    font-size: 18px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

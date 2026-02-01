@@ -1,0 +1,14 @@
+[package]
+name = "jolly-settings"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+slint = "1.8"
+jollypad-core = { path = "../../crates/core" }
+jollypad-ui-kit = { path = "../../crates/ui-kit" }
+i-slint-backend-winit = "1.8"
+catacomb_ipc = { path = "../../crates/ipc" }
+
+[build-dependencies]
+slint-build = "1.8"

@@ -1,0 +1,338 @@
+import { Theme } from "styles.slint";
+import { PadItem } from "types.slint";
+import { PadGrid } from "pad.slint";
+
+export component NavOverlay inherits Window {
+    in-out property <int> nav-index: 0;
+    in property <[PadItem]> nav-items;
+    
+    in property <[PadItem]> window-items;
+    in-out property <int> window-index: 0;
+    
+    in property <[PadItem]> power-items;
+    in-out property <int> power-index: 0;
+    
+    in-out property <bool> ready: true;
+    
+    // New State
+    in-out property <bool> expanded: false;
+    in-out property <bool> content-focused: false;
+    
+    public function reset() {
+        root.expanded = false;
+        root.content-focused = false;
+        root.window-index = 0;
+        root.power-index = 0;
+    }
+    public function soft_reset() {
+        root.expanded = false;
+        root.content-focused = false;
+        root.window-index = 0;
+        root.power-index = 0;
+    }
+    
+    callback on-nav-action(int);
+    callback on-window-action(string);
+    callback on-power-action(string);
+    callback close-requested();
+    callback debug-log(string);
+
+    no-frame: true;
+    background: transparent;
+    title: "JollyPad-Overlay";
+    
+    forward-focus: nav-handler;
+    nav-handler := FocusScope {
+        key-pressed(event) => {
+             // Universal Back/Close
+             if (event.text == Key.Escape) {
+                 if (root.content-focused) {
+                     root.content-focused = false;
+                     // Don't close expand immediately on B if we just want to exit focus?
+                     // User: "Press B return to previous layer". Previous layer is Nav Bar (expanded).
+                     // But usually one wants to collapse.
+                     // Let's collapse.
+                     root.expanded = false; 
+                     return accept;
+                 }
+                 if (root.expanded) {
+                     root.expanded = false;
+                     return accept;
+                 }
+                 root.close-requested();
+                 return accept;
+             }
+
+             // Content Interaction (Grid)
+             if (root.content-focused) {
+                 // Determine which list and index we are using
+                 let is-power = (root.nav-index == 5);
+                 let list-len = is-power ? root.power-items.length : root.window-items.length;
+                 let cols = 4;
+                 
+                 if (event.text == Key.UpArrow) {
+                     // Single row mode: Up arrow always exits content focus
+                     root.content-focused = false;
+                     return accept;
+                 }
+                 if (event.text == Key.DownArrow) {
+                     // Single row mode: Down arrow does nothing or wraps?
+                     // Standard behavior: Do nothing.
+                     return accept;
+                 }
+                 if (event.text == Key.LeftArrow) {
+                     if (is-power) {
+                         if (root.power-index > 0) { root.power-index -= 1; }
+                     } else {
+                         if (root.window-index > 0) { root.window-index -= 1; }
+                     }
+                     return accept;
+                 }
+                 if (event.text == Key.RightArrow) {
+                     if (is-power) {
+                         if (root.power-index < list-len - 1) { root.power-index += 1; }
+                     } else {
+                         if (root.window-index < list-len - 1) { root.window-index += 1; }
+                     }
+                     return accept;
+                 }
+                 if (event.text == Key.Return) {
+                     if (is-power) {
+                         if (root.power-items.length > 0) {
+                             root.on-power-action(root.power-items[root.power-index].exec);
+                         }
+                     } else {
+                         if (root.window-items.length > 0) {
+                             root.on-window-action(root.window-items[root.window-index].exec);
+                         }
+                     }
+                     return accept;
+                 }
+                 return accept;
+             }
+
+             // Nav Bar Interaction
+             if (!root.content-focused) {
+                 if (event.text == Key.LeftArrow) {
+                     if (root.nav-index > 0) { root.nav-index -= 1; }
+                     // "Left/Right cancels expanded content"
+                     root.expanded = false;
+                     return accept;
+                 }
+                 if (event.text == Key.RightArrow) {
+                     if (root.nav-index < root.nav-items.length - 1) { root.nav-index += 1; }
+                     root.expanded = false;
+                     return accept;
+                 }
+                 
+                 // Toggle Expand or Action
+                 if (event.text == Key.Return || event.text == Key.DownArrow || event.text == "a") { // 'a' key mapping? Slint uses text.
+                     // Check if expandable (Overview=1, Power=5)
+                     if (root.nav-index == 1 || root.nav-index == 5) {
+                         if (event.text == Key.DownArrow && !root.expanded) {
+                             root.expanded = true;
+                             root.content-focused = true;
+                             return accept;
+                         }
+                         if (event.text == Key.DownArrow && root.expanded) {
+                             root.content-focused = true;
+                             return accept;
+                         }
+                         
+                         // Key.Return toggles expansion
+                         if (event.text == Key.Return) {
+                            root.expanded = !root.expanded;
+                            // If expanded, focus remains on Nav (Peek mode)
+                         }
+                         return accept;
+                     } else {
+                         // Normal Action
+                         if (event.text == Key.Return) {
+                            root.on-nav-action(root.nav-index);
+                         }
+                         return accept;
+                     }
+                 }
+             }
+             
+             reject
+        }
+    }
+    
+    // Full screen overlay area
+    TouchArea { 
+        clicked => { root.close-requested(); }
+        width: 100%;
+        height: 100%;
+    }
+
+
+    property <length> required-width: 40px + root.nav-items.length * 170px;
+
+    // Wrapper to break layout cycle and center content manually
+    Rectangle {
+        width: 100%;
+        height: 100%;
+
+        // Adaptive container
+        nav-container := Rectangle {
+            // Manual centering
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            
+            // Visibility control for smooth hiding
+            opacity: root.ready ? 1.0 : 0.0;
+            animate opacity { duration: 50ms; }
+
+            // Determine if we need to scale down
+            property <float> scale-factor: root.width < root.required-width + 40px ? (root.width - 40px) / root.required-width : 1.0;
+            
+            // Width fixed to required width (scaled)
+            width: root.required-width * self.scale-factor;
+            
+            property <length> nav-height: 244px * self.scale-factor;
+            property <length> content-height: root.expanded ? 200px : 0px; // Fixed height for single row grid
+            
+            height: nav-height + content-height;
+            animate height { duration: 250ms; easing: cubic-bezier(0.2, 0.0, 0.0, 1.0); }
+                
+                property <length> item-width: 140px * self.scale-factor;
+                property <length> item-height: 180px * self.scale-factor;
+                property <length> item-spacing: 30px * self.scale-factor;
+                property <length> container-padding: 30px * self.scale-factor;
+                property <length> icon-size: 96px * self.scale-factor;
+                property <length> font-size-large: 24px * self.scale-factor;
+                property <length> font-size-small: 20px * self.scale-factor;
+                
+                // Frosted glass simulation (Semi-transparent dark)
+                background: rgba(30, 30, 30, 0.85);
+                border-radius: 24px * self.scale-factor;
+                border-width: 1.5px; 
+                // Glass edge effect
+                border-color: rgba(255, 255, 255, 0.15); 
+                
+                // Shadow for floating effect
+                drop-shadow-blur: 20px;
+                drop-shadow-color: rgba(0, 0, 0, 0.5);
+                drop-shadow-offset-x: 0px;
+                drop-shadow-offset-y: 10px;
+                
+                VerticalLayout {
+                    padding: 0px;
+                    spacing: 0px;
+                    
+                    // Nav Bar
+                    HorizontalLayout {
+                        height: nav-container.nav-height;
+                        alignment: center;
+                        spacing: nav-container.item-spacing;
+                        padding: nav-container.container-padding;
+                
+                        for item[i] in root.nav-items : Rectangle {
+                            width: nav-container.item-width;
+                            height: nav-container.item-height;
+                            border-radius: 16px * nav-container.scale-factor;
+                            background: (i == root.nav-index && !root.content-focused) ? rgba(255, 255, 255, 0.15) : transparent;
+                            
+                            // Visual indication of expanded state for parent item
+                            border-width: (i == root.nav-index && root.expanded) ? 2px : 0px;
+                            border-color: rgba(255, 255, 255, 0.5);
+
+                            VerticalLayout {
+                                alignment: center;
+                                spacing: 12px * nav-container.scale-factor;
+                                
+                                if (item.has-icon) : Rectangle {
+                                    width: parent.width;
+                                    height: nav-container.icon-size;
+                                    background: transparent;
+                                    
+                                    Image {
+                                        source: item.icon;
+                                        width: nav-container.icon-size;
+                                        height: nav-container.icon-size;
+                                        x: (parent.width - self.width) / 2;
+                                        y: (parent.height - self.height) / 2;
+                                    }
+                                }
+                                if (!item.has-icon) : Text {
+                                    text: item.name;
+                                    font-size: nav-container.font-size-large;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                    wrap: word-wrap;
+                                }
+                                
+                                Text {
+                                    text: item.name;
+                                    color: white;
+                                    font-size: nav-container.font-size-small;
+                                    horizontal-alignment: center;
+                                }
+                            }
+                            
+                            TouchArea {
+                                clicked => { 
+                                    root.nav-index = i;
+                                    if (i == 1 || i == 5) {
+                                        root.expanded = !root.expanded;
+                                    } else {
+                                        root.on-nav-action(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Content Area
+                    Rectangle {
+                        clip: true;
+                        height: root.expanded ? 200px : 0px;
+                        animate height { duration: 250ms; easing: cubic-bezier(0.2, 0.0, 0.0, 1.0); }
+                        
+                        // Divider
+                        Rectangle {
+                            width: parent.width - 60px;
+                            height: 1px;
+                            background: rgba(255, 255, 255, 0.1);
+                            x: 30px;
+                            y: 0px;
+                            opacity: root.expanded ? 1.0 : 0.0;
+                            animate opacity { duration: 250ms; }
+                        }
+
+                        // Overview Grid
+                        if (root.nav-index == 1) : PadGrid {
+                            width: parent.width - 60px;
+                            height: parent.height - 30px;
+                            x: 30px;
+                            y: 15px;
+                            items: root.window-items;
+                            selected-index <=> root.window-index;
+                            columns: 4;
+                            is-overview: true;
+                            single-row: true;
+                            opacity: root.content-focused ? 1.0 : 0.7;
+                            item-clicked(exec, name) => { root.on-window-action(exec); }
+                        }
+
+                        // Power Grid
+                        if (root.nav-index == 5) : PadGrid {
+                            width: parent.width - 60px;
+                            height: parent.height - 30px;
+                            x: 30px;
+                            y: 15px;
+                            items: root.power-items;
+                            selected-index <=> root.power-index;
+                            columns: 4;
+                            is-overview: true;
+                            single-row: true;
+                            hide-text: true;
+                            opacity: root.content-focused ? 1.0 : 0.7;
+                            item-clicked(exec, name) => { root.on-power-action(exec); }
+                        }
+                    }
+                }
+        }
+    }
+}

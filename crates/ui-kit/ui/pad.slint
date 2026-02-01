@@ -1,0 +1,161 @@
+import { Theme } from "styles.slint";
+import { VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { PadItem } from "types.slint";
+
+export component PadGrid inherits Rectangle {
+    in property <[PadItem]> items;
+    callback item-clicked(string, string, string); // exec, name, app-id
+    in-out property <int> selected-index: 0;
+    in property <int> columns: 6;
+    in property <bool> is-overview: false; // Add mode flag
+    in property <bool> single-row: false; // Single row mode for expanded view
+    in property <bool> hide-text: false; // Hide text label
+    callback activate-selected();
+
+    background: transparent;
+
+    forward-focus: touch-handler;
+    touch-handler := FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.UpArrow) {
+                if (!root.single-row) {
+                    if (root.selected-index >= root.columns) {
+                        root.selected-index -= root.columns;
+                    }
+                }
+                return accept;
+            }
+            if (event.text == Key.DownArrow) {
+                if (!root.single-row) {
+                    if (root.selected-index + root.columns < root.items.length) {
+                        root.selected-index += root.columns;
+                    }
+                }
+                return accept;
+            }
+            if (event.text == Key.LeftArrow) {
+                if (root.selected-index > 0) {
+                    root.selected-index -= 1;
+                }
+                return accept;
+            }
+            if (event.text == Key.RightArrow) {
+                if (root.selected-index < root.items.length - 1) {
+                    root.selected-index += 1;
+                }
+                return accept;
+            }
+            if (event.text == Key.Return) {
+                root.activate-selected();
+                return accept;
+            }
+            reject
+        }
+    }
+    
+    // Auto-scroll calculation for single row
+    property <length> item-w: (root.single-row) ? 144px : (root.width - (root.columns + 1) * 20px) / root.columns;
+    property <length> item-h: (root.single-row) ? 144px : 180px;
+    property <length> item-gap: 20px;
+    
+    // Calculate target scroll position to keep selected item in view
+    // Center the selected item: selected-x - width/2 + item-w/2
+    property <length> target-viewport-x: root.single-row ? 
+        clamp(-root.selected-index * (root.item-w + root.item-gap) + root.width / 2 - root.item-w / 2,
+              root.width - (root.items.length * (root.item-w + root.item-gap) + root.item-gap), 0px)
+        : 0px;
+
+    Flickable {
+        interactive: true;
+        viewport-height: root.single-row ? root.height : (items.length / root.columns + 1) * 200px; 
+        viewport-width: root.single-row ? (items.length * (root.item-w + root.item-gap) + root.item-gap) : root.width;
+        
+        viewport-x: root.single-row ? root.target-viewport-x : 0px;
+        animate viewport-x { duration: 200ms; easing: cubic-bezier(0.2, 0.0, 0.0, 1.0); }
+        
+        for item[i] in items : Rectangle {
+            width: root.item-w;
+            height: root.item-h;
+            
+            x: root.single-row ? 
+               (i * (root.item-w + root.item-gap) + root.item-gap) : 
+               (mod(i, root.columns) * (root.item-w + 20px) + 20px);
+               
+            y: root.single-row ? 
+               (parent.height - self.height) / 2 : 
+               (floor(i / root.columns) * (self.height + 20px) + 20px);
+            
+            background: (i == root.selected-index) ? Theme.card-hover : (touch.pressed ? Theme.card-hover : transparent);
+            border-radius: Theme.border-radius;
+            
+            touch := TouchArea {
+                clicked => { root.item-clicked(item.exec, item.name, item.app-id); }
+            }
+
+            // Overview Mode: Vertical Layout with both Icon and Text
+            if (root.is-overview && !root.hide-text) : VerticalLayout {
+                padding: 8px;
+                spacing: 8px;
+                alignment: center;
+
+                if (item.has-icon) : Image {
+                    width: 64px;
+                    height: 64px;
+                    source: item.icon;
+                    horizontal-alignment: center;
+                }
+                
+                Text {
+                    text: item.name;
+                    color: Theme.text-color;
+                    font-size: 14px;
+                    wrap: word-wrap;
+                    overflow: elide;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+            
+            // Overview Mode (Icon Only / Hide Text): Manual Centering
+            if (root.is-overview && root.hide-text && item.has-icon) : Image {
+                width: 64px;
+                height: 64px;
+                source: item.icon;
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+            }
+
+            // Home Mode: Standard Layout (Icon centered, or Text if no icon)
+            if (!root.is-overview && item.has-icon) : Image {
+                width: 128px;
+                height: 128px;
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                source: item.icon;
+            }
+            
+            if (!root.is-overview && !item.has-icon) : Text {
+                text: item.name;
+                color: Theme.text-color;
+                font-size: 24px;
+                wrap: word-wrap;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                width: parent.width - 16px;
+                height: parent.height - 16px;
+                x: 8px;
+                y: 8px;
+            }
+        }
+    }
+    
+    activate-selected => {
+        if (items.length > 0) {
+            let idx0 = root.selected-index;
+            let idx1 = (idx0 < 0) ? 0 : idx0;
+            let last = items.length - 1;
+            let idx = (idx1 > last) ? last : idx1;
+            root.item-clicked(items[idx].exec, items[idx].name, items[idx].app-id);
+        }
+    }
+}

@@ -1,0 +1,258 @@
+import { Theme } from "styles.slint";
+import { PadGrid } from "pad.slint";
+import { PadItem } from "types.slint";
+
+export { PadItem }
+
+// 1. Full Dashboard (Original)
+export component MainWindow inherits Window {
+    in property <[PadItem]> pad-items;
+    in property <[PadItem]> island-windows;
+    in property <int> controller-count: 0;
+    in property <bool> has-controller-icon: false;
+    in property <image> controller-icon;
+    in property <[PadItem]> controller-icons;
+    in-out property <int> selected-index: 0;
+    in property <string> user-name;
+    in property <bool> has-user-avatar;
+    in property <image> user-avatar;
+    in property <string> user-initial;
+    in-out property <bool> is-launching: false;
+    
+    in-out property <bool> is-confirming: false;
+    in property <string> confirm-message;
+    callback on-confirm();
+    callback on-cancel();
+    
+    callback on-pad-action(string, string, string);
+    callback on-island-action(string);
+    callback activate-selected();
+
+    no-frame: true;
+    background: transparent;
+    title: "JollyPad-Desktop";
+    forward-focus: pad;
+    
+    // 顶部“灵动岛”
+    island := Rectangle {
+        x: (root.width - self.width) / 2;
+        y: 16px;
+        width: 560px;
+        height: 64px;
+        background: rgba(32, 32, 34, 0.45);
+        border-radius: 32px;
+        border-width: 1px;
+        border-color: rgba(255, 255, 255, 0.18);
+        clip: true;
+        HorizontalLayout {
+            padding-left: 16px;
+            padding-right: 16px;
+            spacing: 12px;
+            Rectangle {
+                horizontal-stretch: 1;
+                background: transparent;
+            }
+            // 当前打开的应用图标
+            Rectangle {
+                height: parent.height;
+                width: 300px;
+                background: transparent;
+                HorizontalLayout {
+                    spacing: 10px;
+                    for item[i] in root.controller-icons : Rectangle {
+                        width: 40px;
+                        height: 40px;
+                        y: (parent.height - self.height) / 2;
+                        border-radius: 12px;
+                        background: rgba(255, 255, 255, 0.12);
+                        TouchArea { clicked => { root.on-island-action(item.exec); } }
+                        if (item.has-icon) : Image {
+                            width: 28px;
+                            height: 28px;
+                            source: item.icon;
+                            x: (parent.width - self.width) / 2;
+                            y: (parent.height - self.height) / 2;
+                        }
+                        if (!item.has-icon) : Text {
+                            text: item.name;
+                            color: white;
+                            font-size: 12px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                            width: parent.width - 6px;
+                            height: parent.height - 6px;
+                            x: 3px;
+                            y: 3px;
+                        }
+                    }
+                    for item[i] in root.island-windows : Rectangle {
+                        width: 40px;
+                        height: 40px;
+                        y: (parent.height - self.height) / 2;
+                        border-radius: 12px;
+                        background: rgba(255, 255, 255, 0.12);
+                        touch := TouchArea { clicked => { root.on-island-action(item.exec); } }
+                        if (item.has-icon) : Image {
+                            width: 28px;
+                            height: 28px;
+                            source: item.icon;
+                            x: (parent.width - self.width) / 2;
+                            y: (parent.height - self.height) / 2;
+                        }
+                        if (!item.has-icon) : Text {
+                            text: item.name;
+                            color: white;
+                            font-size: 12px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                            width: parent.width - 6px;
+                            height: parent.height - 6px;
+                            x: 3px;
+                            y: 3px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // App Grid area
+    Rectangle {
+        x: 0px;
+        y: island.y + island.height + 16px;
+        width: root.width;
+        height: root.height - (island.y + island.height) - 16px - 24px;
+        background: transparent;
+        pad := PadGrid {
+            x: 0px;
+            y: 0px;
+            width: parent.width;
+            height: parent.height;
+            items: root.pad-items;
+            selected-index: root.selected-index >= 0 ? root.selected-index : -1;
+            columns: 6;
+            item-clicked(exec, name, app-id) => { root.on-pad-action(exec, name, app-id); }
+        }
+    }
+    
+    activate-selected => { 
+        if (root.selected-index >= 0) {
+            pad.activate-selected();
+        }
+    }
+
+    Rectangle {
+        x: 0px;
+        y: 0px;
+        width: root.width;
+        height: root.height;
+        background: rgba(0, 0, 0, 0.4);
+        visible: root.is-launching;
+        Text {
+            text: "正在启动…";
+            color: white;
+            font-size: 24px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    Rectangle {
+        x: 0px;
+        y: 0px;
+        width: root.width;
+        height: root.height;
+        background: rgba(0, 0, 0, 0.7);
+        visible: root.is-confirming;
+        z: 100;
+        
+        TouchArea {} // Block input
+
+        Rectangle {
+            width: 480px;
+            height: 240px;
+            background: #2b2b2b;
+            border-radius: 16px;
+            border-width: 1px;
+            border-color: #555;
+            
+            VerticalLayout {
+                padding: 32px;
+                spacing: 32px;
+                alignment: center;
+                
+                Text {
+                    text: root.confirm-message;
+                    color: white;
+                    font-size: 20px;
+                    wrap: word-wrap;
+                    horizontal-alignment: center;
+                }
+                
+                HorizontalLayout {
+                    spacing: 24px;
+                    alignment: center;
+                    
+                    Rectangle {
+                        width: 140px;
+                        height: 48px;
+                        border-radius: 12px;
+                        background: #444;
+                        TouchArea {
+                            clicked => { root.on-cancel(); }
+                        }
+                        Text {
+                            text: "取消";
+                            color: white;
+                            font-size: 18px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                    
+                    Rectangle {
+                        width: 140px;
+                        height: 48px;
+                        border-radius: 12px;
+                        background: #e74c3c;
+                        TouchArea {
+                            clicked => { root.on-confirm(); }
+                        }
+                        Text {
+                            text: "关闭并启动";
+                            color: white;
+                            font-size: 18px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 2. Standalone App Grid (Launcher)
+export component AppGridWindow inherits Window {
+    in property <[PadItem]> items;
+    callback on-action(string, string);
+    in-out property <int> selected-index: 0;
+    callback activate-selected();
+
+    no-frame: true;
+    background: rgba(0, 0, 0, 0.4); // Slightly darker bg for standalone launcher
+    title: "JollyPad-Launcher";
+    forward-focus: pad;
+    
+    VerticalLayout {
+        padding: 60px;
+        pad := PadGrid {
+            items: root.items;
+            selected-index: root.selected-index;
+            columns: 6;
+            item-clicked(exec, name) => { root.on-action(exec, name); }
+        }
+    }
+    
+    activate-selected => { pad.activate-selected(); }
+}

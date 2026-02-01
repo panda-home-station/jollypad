@@ -4,10 +4,10 @@ resolver = "2"
 members = [
     "apps/catacomb",
     "crates/ipc",
-    "jolly/crates/core",
-    "jolly/crates/ui",
-    "jolly/apps/home",
-    "jolly/apps/nav",
-    "jolly/apps/settings",
+    "crates/core",
+    "crates/ui-kit",
+    "apps/home",
+    "apps/nav",
+    "apps/settings",
     "apps/launcher",
 ]
