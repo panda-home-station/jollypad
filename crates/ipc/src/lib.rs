@@ -691,8 +691,7 @@ pub fn send_message(message: &IpcMessage) -> Result<Option<IpcMessage>, Box<dyn 
     let socket_name = match env::var("WAYLAND_DISPLAY") {
         Ok(socket_name) => socket_name,
         Err(_) => {
-            eprintln!("Error: WAYLAND_DISPLAY is not set");
-            process::exit(101);
+            return Err("Error: WAYLAND_DISPLAY is not set".into());
         },
     };
 
@@ -700,8 +699,7 @@ pub fn send_message(message: &IpcMessage) -> Result<Option<IpcMessage>, Box<dyn 
 
     // Ensure Catacomb's IPC listener is running.
     if !socket_path.exists() {
-        eprintln!("Error: IPC socket not found, ensure Catacomb is running");
-        process::exit(102);
+        return Err("Error: IPC socket not found, ensure Catacomb is running".into());
     }
 
     let mut stream = UnixStream::connect(&socket_path)?;

@@ -184,10 +184,27 @@ fn spawn_apps() -> Result<()> {
     } else {
         "/tmp/jolly-home.log".to_string()
     };
+    println!("📝 Jolly Home logs will be written to: {}", log_path);
+
     let log_file = fs::File::create(&log_path).context("Failed to create log file")?;
     let log_file_err = log_file.try_clone().context("Failed to clone log file handle")?;
 
-    Command::new("jolly-home")
+    // Find jolly-home binary
+    let cwd = std::env::current_dir()?;
+    let mut home_binary = cwd.join("target/debug/jolly-home");
+    if !home_binary.exists() {
+        let release_binary = cwd.join("target/release/jolly-home");
+        if release_binary.exists() {
+            home_binary = release_binary;
+        } else {
+            // Fallback to expecting it in PATH if not found in target
+            home_binary = std::path::PathBuf::from("jolly-home");
+        }
+    }
+
+    println!("🏠 Spawning Jolly Home from: {:?}", home_binary);
+
+    Command::new(home_binary)
         .stdout(Stdio::from(log_file))
         .stderr(Stdio::from(log_file_err))
         .spawn()
