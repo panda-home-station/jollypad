@@ -74,15 +74,25 @@ fn setup_initrc() -> Result<()> {
     // We want to use our compiled jolly-startup binary as the initrc
     // Assuming we are running from the workspace root
     let cwd = env::current_dir()?;
-    let startup_binary = cwd.join("target/debug/jolly-startup");
+    let mut startup_binary = cwd.join("target/debug/jolly-startup");
+    
+    if !startup_binary.exists() {
+        let release_binary = cwd.join("target/release/jolly-startup");
+        if release_binary.exists() {
+            startup_binary = release_binary;
+        }
+    }
     
     if !startup_binary.exists() {
         println!("⚠️  Warning: Startup binary not found at {:?}", startup_binary);
         println!("   Please run 'cargo build' first!");
     }
 
-    if initrc_path.exists() {
-        fs::remove_file(&initrc_path)?;
+    // Remove existing initrc if it exists (handling broken symlinks)
+    if let Err(e) = fs::remove_file(&initrc_path) {
+        if e.kind() != std::io::ErrorKind::NotFound {
+            return Err(e.into());
+        }
     }
 
     #[cfg(unix)]
