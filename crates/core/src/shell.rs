@@ -38,7 +38,6 @@ pub fn dispatch_exec(cmd: &str, card_id: Option<&str>) {
         return;
     }
 
-    let mut hint: Option<String> = None;
     let trimmed = cmd.trim();
     
     fn extract_flatpak_app_id(cmd: &str) -> Option<String> {
@@ -64,7 +63,7 @@ pub fn dispatch_exec(cmd: &str, card_id: Option<&str>) {
         None
     }
     
-    hint = extract_flatpak_app_id(trimmed);
+    let hint = extract_flatpak_app_id(trimmed);
     CatacombClient::exec_or_focus(cmd, hint.as_deref(), card_id);
 }
 

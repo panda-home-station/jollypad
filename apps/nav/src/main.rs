@@ -92,7 +92,7 @@ fn main() -> Result<(), slint::PlatformError> {
         TOGGLE_REQUESTED.store(true, Ordering::SeqCst);
     }
     unsafe {
-        libc::signal(libc::SIGUSR1, handle_sigusr1 as usize);
+        libc::signal(libc::SIGUSR1, handle_sigusr1 as *const () as usize);
     }
 
     // State monitor to handle external toggle via signal
