@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-catacomb_ipc = { path = "../catacomb/catacomb_ipc", features = ["clap"] }
+catacomb_ipc = { path = "../../crates/ipc", features = ["clap"] }
 sysinfo = "0.30"
 anyhow = "1.0"
 dirs = "5.0"

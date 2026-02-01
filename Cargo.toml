@@ -9,5 +9,5 @@ members = [
     "jolly/apps/home",
     "jolly/apps/nav",
     "jolly/apps/settings",
-    "jolly-launcher",
+    "apps/launcher",
 ]
