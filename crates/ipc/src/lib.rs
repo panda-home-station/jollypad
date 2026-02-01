@@ -15,7 +15,7 @@ use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
 #[cfg(feature = "clap")]
 use std::str::FromStr;
-use std::{env, process};
+use std::env;
 
 #[cfg(feature = "clap")]
 use clap::error::{Error as ClapError, ErrorKind as ClapErrorKind};

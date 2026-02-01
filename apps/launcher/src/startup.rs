@@ -6,7 +6,7 @@ use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
-fn main() -> Result<()> {
+pub fn run() -> Result<()> {
     println!("🚀 Jolly Startup running...");
 
     // Wait for socket to be ready (retry loop)

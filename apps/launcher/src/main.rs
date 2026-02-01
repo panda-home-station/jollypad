@@ -6,6 +6,8 @@ use std::thread;
 use std::time::Duration;
 use sysinfo::{ProcessRefreshKind, RefreshKind, System};
 
+mod startup;
+
 fn main() -> Result<()> {
     println!("🚀 Starting JollyPad Launcher...");
 
@@ -30,11 +32,16 @@ fn main() -> Result<()> {
     // Give catacomb a moment to initialize the socket
     thread::sleep(Duration::from_secs(1));
     println!("🚀 Starting startup script...");
-    let mut startup_process = start_startup()?;
+    
+    // Spawn startup function in a separate thread
+    thread::spawn(|| {
+        if let Err(e) = startup::run() {
+            eprintln!("❌ Startup failed: {}", e);
+        }
+    });
 
     // 6. Monitor Loop
     // We want to keep running as long as catacomb is alive.
-    // We also want to reap startup process if it finishes.
     loop {
         // Check catacomb status
         match catacomb_process.try_wait() {
@@ -50,19 +57,6 @@ fn main() -> Result<()> {
                 // Catacomb is still running
             },
             Err(e) => anyhow::bail!("Error waiting for catacomb: {}", e),
-        }
-
-        // Check startup status (to prevent zombie)
-        match startup_process.try_wait() {
-            Ok(Some(_)) => {
-                // Startup finished, that's fine.
-            },
-            Ok(None) => {
-                // Startup still running
-            },
-            Err(_) => {
-                // Ignore errors here
-            },
         }
         
         thread::sleep(Duration::from_millis(500));
@@ -152,35 +146,6 @@ fn start_catacomb() -> Result<std::process::Child> {
         .spawn()
         .context("Failed to start catacomb")?;
 
-    Ok(child)
-}
-
-fn start_startup() -> Result<std::process::Child> {
-    // We want to use our compiled jolly-startup binary
-    // Assuming we are running from the workspace root
-    let cwd = env::current_dir()?;
-    let mut startup_binary = cwd.join("target/debug/jolly-startup");
-    
-    if !startup_binary.exists() {
-        let release_binary = cwd.join("target/release/jolly-startup");
-        if release_binary.exists() {
-            startup_binary = release_binary;
-        }
-    }
-    
-    if !startup_binary.exists() {
-        println!("⚠️  Warning: Startup binary not found at {:?}", startup_binary);
-        println!("   Please run 'cargo build' first!");
-    }
-
-    // We MUST set WAYLAND_DISPLAY so startup (and its children) know where to connect.
-    // Catacomb typically defaults to wayland-0 if available.
-    // If this fails, we might need a more robust way to discover the socket.
-    let child = Command::new(startup_binary)
-        .env("WAYLAND_DISPLAY", "wayland-0") 
-        .spawn()
-        .context("Failed to spawn jolly-startup")?;
-        
     Ok(child)
 }
 
