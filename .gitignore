@@ -4,3 +4,5 @@ assets
 tmp
 target
 log
+*.log
+*.sh
