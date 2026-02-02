@@ -40,6 +40,21 @@ fn setup_audio() -> Result<()> {
     
     // Retry finding HDMI sink for up to 5 seconds
     let script = "
+        echo \"🔊 Initializing Audio...\"
+        
+        # 1. Find NVIDIA card and set profile to HDMI
+        # We need this because sometimes it defaults to 'off' or 'pro-audio' which has no HDMI sink
+        card=$(pactl list cards short | grep -i \"nvidia\" | cut -f2 | head -n1)
+        if [ ! -z \"$card\" ]; then
+            echo \"Found NVIDIA card: $card\"
+            echo \"Setting profile to output:hdmi-stereo...\"
+            pactl set-card-profile \"$card\" output:hdmi-stereo
+        else
+            echo \"⚠️ Could not find NVIDIA card in PulseAudio\"
+        fi
+        
+        sleep 1
+
         for i in {1..10}; do
             sink=$(pactl list short sinks | grep 'hdmi' | cut -f2 | head -n1)
             if [ ! -z \"$sink\" ]; then

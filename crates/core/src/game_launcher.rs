@@ -96,10 +96,22 @@ pub fn prepare_game_launch(app_id: &str) -> Result<GameLaunchInfo> {
     if is_game {
         // Game mode: use umu-run
         let umu_run = tools_dir.join("umu-run");
-        let args = vec![exec_path];
+        
+        // Wrap in shell to ensure audio setup
+        // We unload module-raop-discover to prevent AirPlay hijacking which causes no sound
+        // We use sh -c with args to avoid quoting issues
+        let wrapper_script = "pactl unload-module module-raop-discover 2>/dev/null || true; pactl unload-module module-suspend-on-idle 2>/dev/null || true; exec \"$1\" \"$2\"";
+        
+        let args = vec![
+            "-c".to_string(),
+            wrapper_script.to_string(),
+            "game-wrapper".to_string(), // $0
+            umu_run.to_string_lossy().to_string(), // $1
+            exec_path, // $2
+        ];
         
         Ok(GameLaunchInfo {
-            program: umu_run,
+            program: PathBuf::from("sh"),
             args,
             envs,
         })
