@@ -10,4 +10,5 @@ members = [
     "apps/nav",
     "apps/settings",
     "apps/launcher",
+    "apps/debug",
 ]

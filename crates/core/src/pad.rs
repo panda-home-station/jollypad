@@ -161,25 +161,33 @@ impl IconLoader {
 }
 
 fn parse_ini_app(content: &str, default_app_id: &str) -> Option<AppItem> {
-    println!("DEBUG: parsing ini for {}", default_app_id);
+    println!("DEBUG: parsing ini for {} (VERSION 2)", default_app_id);
     let mut in_app = false;
     let mut in_game = false;
+    let mut is_game_type = false;
     let mut name = String::new();
     let mut icon = String::new();
     let mut exec = String::new();
     let mut app_id = String::new();
     
     for line in content.lines() {
-        let t = line.trim();
-        if t.starts_with('[') {
-            if t.eq_ignore_ascii_case("[App]") {
+        let trimmed_line = line.trim().trim_matches('\u{FEFF}');
+        println!("DEBUG: parsing line='{}' in_app={} in_game={}", trimmed_line, in_app, in_game);
+        if trimmed_line.starts_with('[') && trimmed_line.ends_with(']') {
+            let section = trimmed_line[1..trimmed_line.len()-1].trim();
+            if section.eq_ignore_ascii_case("App") {
                 in_app = true;
                 in_game = false;
                 println!("DEBUG: Found [App] section");
-            } else if t.eq_ignore_ascii_case("[Game]") {
+            } else if section.eq_ignore_ascii_case("Game") {
                 in_app = false;
                 in_game = true;
+                is_game_type = true;
                 println!("DEBUG: Found [Game] section");
+            } else if section.eq_ignore_ascii_case("Env") {
+                in_app = false;
+                in_game = false;
+                println!("DEBUG: Found [Env] section");
             } else {
                 in_app = false;
                 in_game = false;
@@ -187,22 +195,21 @@ fn parse_ini_app(content: &str, default_app_id: &str) -> Option<AppItem> {
             continue;
         }
         
-        if (!in_app && !in_game) || t.is_empty() { continue; }
+        if (!in_app && !in_game) || trimmed_line.is_empty() { continue; }
         
-        if let Some((k,v)) = t.split_once('=') {
-            let key = k.trim();
-            let val = v.trim();
+        if let Some((k,v)) = trimmed_line.split_once('=') {
+            let key = k.trim().trim_matches('\u{FEFF}');
+            let val = v.trim().trim_matches('\u{FEFF}');
+            println!("DEBUG: Key='{}', Val='{}' (in_app={}, in_game={})", key, val, in_app, in_game);
             match key {
                 "Name" => name = val.to_string(),
                 "Icon" => icon = val.to_string(),
-                "Exec" => {
-                    if in_app {
-                        exec = val.to_string();
+                "Exec" => exec = val.to_string(),
+                "Type" => {
+                    if val.eq_ignore_ascii_case("Game") {
+                        is_game_type = true;
                     }
-                    // For [Game], we ignore the Exec line here as it points to the EXE
-                    // We will construct the launcher command later
-                },
-                "AppId" => app_id = val.to_string(),
+                }
                 _ => {}
             }
         }
@@ -214,18 +221,18 @@ fn parse_ini_app(content: &str, default_app_id: &str) -> Option<AppItem> {
         app_id
     };
 
-    if in_game {
-        // If it's a game, we use the game-launcher wrapper
-        // exec = format!("game-launcher {} run", final_app_id); 
-        // Wait, game-launcher takes [app_id] [command] currently.
-        // If we change game-launcher to just take app_id, we can do:
+    if is_game_type {
+        // exec = format!("game-launcher {} run", final_app_id);
         exec = format!("game-launcher {}", final_app_id);
     }
+    
+    println!("DEBUG: Finished parsing '{}'. Name='{}', Exec='{}', is_game={}", final_app_id, name, exec, is_game_type);
 
     if !name.is_empty() && !exec.is_empty() {
         Some(AppItem { name, icon, exec, app_id: final_app_id })
     } else {
-        None 
+        println!("DEBUG: App rejected due to empty name or exec");
+        None
     }
 }
 
@@ -252,4 +259,31 @@ pub fn get_default_items(_icon_loader: &IconLoader) -> Vec<AppItem> {
     }
     apps.sort_by(|a,b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
     apps
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_loose_ini() {
+        let content = r#"
+        [App]
+        Name=Test App
+        Icon=test.png
+        Exec=test_exec
+        "#;
+        let app = parse_ini_app(content, "test.app").unwrap();
+        assert_eq!(app.name, "Test App");
+        assert_eq!(app.icon, "test.png");
+        assert_eq!(app.exec, "test_exec");
+    }
+
+    #[test]
+    fn test_bom_header() {
+        // Simulate BOM at start of [Game]
+        let content = "\u{FEFF}[Game]\nName=Test Game\nType=Game\nIcon=test.png\nExec=test";
+        let app = parse_ini_app(content, "com.test").unwrap();
+        assert_eq!(app.name, "Test Game");
+    }
 }

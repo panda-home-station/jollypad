@@ -51,7 +51,7 @@ pub fn is_game_app(app_id: &str) -> Result<bool> {
     if !ini_path.exists() {
         return Ok(false);
     }
-    let (_, is_game) = parse_app_ini(&ini_path)?;
+    let (_, is_game, _) = parse_app_ini(&ini_path)?;
     Ok(is_game)
 }
 
@@ -91,7 +91,12 @@ pub fn prepare_game_launch(app_id: &str) -> Result<GameLaunchInfo> {
         return Err(anyhow::anyhow!("Configuration file not found: {:?}", ini_path));
     }
 
-    let (exec_path, is_game) = parse_app_ini(&ini_path)?;
+    let (exec_path, is_game, extra_envs) = parse_app_ini(&ini_path)?;
+    
+    // Merge extra envs from INI
+    for (k, v) in extra_envs {
+        envs.insert(k, v);
+    }
     
     if is_game {
         // Game mode: use umu-run
@@ -126,18 +131,26 @@ pub fn prepare_game_launch(app_id: &str) -> Result<GameLaunchInfo> {
     }
 }
 
-fn parse_app_ini(path: &Path) -> Result<(String, bool)> {
+fn parse_app_ini(path: &Path) -> Result<(String, bool, HashMap<String, String>)> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let mut exec = String::new();
     let mut is_game = false;
+    let mut envs = HashMap::new();
+    let mut in_env_section = false;
 
     for line in reader.lines() {
         let line = line?;
         let t = line.trim();
-        if t.starts_with('[') {
-            if t.eq_ignore_ascii_case("[Game]") {
+        if t.starts_with('[') && t.ends_with(']') {
+            let section = t[1..t.len()-1].trim();
+            if section.eq_ignore_ascii_case("Game") {
                 is_game = true;
+                in_env_section = false;
+            } else if section.eq_ignore_ascii_case("Env") {
+                in_env_section = true;
+            } else {
+                in_env_section = false;
             }
             continue;
         }
@@ -145,8 +158,15 @@ fn parse_app_ini(path: &Path) -> Result<(String, bool)> {
         if let Some((k,v)) = t.split_once('=') {
             let key = k.trim();
             let val = v.trim();
-            if key == "Exec" {
-                exec = val.to_string();
+            if in_env_section {
+                // Handle quoted values if necessary, but simple trim for now
+                // Remove surrounding quotes if present
+                let clean_val = val.trim_matches('"').trim_matches('\'').to_string();
+                envs.insert(key.to_string(), clean_val);
+            } else {
+                if key == "Exec" {
+                    exec = val.to_string();
+                }
             }
         }
     }
@@ -155,7 +175,7 @@ fn parse_app_ini(path: &Path) -> Result<(String, bool)> {
         return Err(anyhow::anyhow!("No Exec line found in {:?}", path));
     }
     
-    Ok((exec, is_game))
+    Ok((exec, is_game, envs))
 }
 
 
@@ -166,7 +186,8 @@ fn load_config(jolly_dir: &Path) -> Result<HashMap<String, String>> {
     config.insert("discrete-gpu".to_string(), "False".to_string());
     config.insert("wayland-driver".to_string(), "False".to_string());
     config.insert("enable-hdr".to_string(), "False".to_string());
-    config.insert("enable-wow64".to_string(), "False".to_string());
+    config.insert("enable-wow64".to_string(), "True".to_string());
+    config.insert("enable-proton-log".to_string(), "True".to_string());
     config.insert("default-runner".to_string(), "Proton-GE Latest".to_string());
 
     let config_path = jolly_dir.join("config.ini");
@@ -212,6 +233,10 @@ fn set_environment_vars(envs: &mut HashMap<String, String>, config: &HashMap<Str
         envs.insert("PROTON_USE_WOW64".to_string(), "1".to_string());
     }
 
+    if config.get("enable-proton-log").map(|v| v == "True").unwrap_or(false) {
+        envs.insert("PROTON_LOG".to_string(), "1".to_string());
+    }
+
     // Audio fixes for Proton:
     // 1. Force higher latency to prevent buffer underruns/dropouts which cause HDMI resync
     envs.insert("PULSE_LATENCY_MSEC".to_string(), "60".to_string());
@@ -222,7 +247,19 @@ fn set_environment_vars(envs: &mut HashMap<String, String>, config: &HashMap<Str
     // This helps ensure games see the real resolution
     envs.insert("WINE_FULLSCREEN_FSR".to_string(), "0".to_string());
     
-    // 4. Suppress pressure-vessel 32-bit warnings if possible (cosmetic but clean logs)
+    // 4. Prevent minimization on focus loss (helps with splash screen transitions)
+    envs.insert("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS".to_string(), "0".to_string());
+    
+    // 5. Force fullscreen for SDL apps
+    envs.insert("SDL_VIDEO_FULLSCREEN_DISPLAY".to_string(), "0".to_string());
+    // Also try to force Proton/Wine to fullscreen mode if possible
+    // Note: SDL_VIDEO_FULLSCREEN_DISPLAY=0 forces the display index, but not necessarily the mode.
+    // We can also add PROTON_FORCE_LARGE_ADDRESS_AWARE=1 just in case for older games.
+    
+    // Attempt to force wine virtual desktop to match screen if needed (not doing it by default yet)
+    // envs.insert("WINE_VIRTUAL_DESKTOP".to_string(), "1920x1080".to_string());
+
+    // 6. Suppress pressure-vessel 32-bit warnings if possible (cosmetic but clean logs)
     // envs.insert("PRESSURE_VESSEL_VERBOSE".to_string(), "0".to_string());
 
     // Set WINEPREFIX to ~/.jolly/prefixes/<app_id>

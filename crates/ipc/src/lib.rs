@@ -297,6 +297,19 @@ pub enum IpcMessage {
     SetOutputMode {
         mode: OutputMode,
     },
+    /// Debug: Get window tree as string.
+    DebugTree,
+    /// Reply for DebugTree.
+    #[cfg_attr(feature = "clap", clap(skip))]
+    DebugTreeReply {
+        tree: String,
+    },
+    /// Debug: Focus window by internal ID (from tree).
+    DebugFocus {
+        index: usize,
+        #[cfg_attr(feature = "clap", clap(long))]
+        secondary: bool,
+    },
 }
 
 /// Output mode information.
@@ -691,7 +704,9 @@ pub fn send_message(message: &IpcMessage) -> Result<Option<IpcMessage>, Box<dyn 
     let socket_name = match env::var("WAYLAND_DISPLAY") {
         Ok(socket_name) => socket_name,
         Err(_) => {
-            return Err("Error: WAYLAND_DISPLAY is not set".into());
+            let default = "wayland-1";
+            eprintln!("Warning: WAYLAND_DISPLAY not set, defaulting to {}", default);
+            default.to_string()
         },
     };
 
@@ -739,6 +754,7 @@ fn listen_for_reply(
             eprintln!("Error: Invalid IPC reply\n  {unexpected_reply:?}");
             Ok(None)
         },
+        (IpcMessage::DebugTree, IpcMessage::DebugTreeReply { .. }) => Ok(Some(reply)),
         _ => Ok(None),
     }
 }

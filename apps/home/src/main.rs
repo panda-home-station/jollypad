@@ -399,34 +399,37 @@ fn load_icon(loader: &IconLoader, icon_name: &str) -> Option<Image> {
     if icon_name.is_empty() { return None; }
 
     // Handle tilde expansion
-    let expanded_name = if icon_name.starts_with("~/") {
+    let clean_name = icon_name.trim().trim_matches('\u{FEFF}');
+    let expanded_name = if clean_name.starts_with("~/") {
         if let Ok(home) = std::env::var("HOME") {
-            format!("{}/{}", home, &icon_name[2..])
+            format!("{}/{}", home, &clean_name[2..])
         } else {
-            icon_name.to_string()
+            clean_name.to_string()
         }
     } else {
-        icon_name.to_string()
+        clean_name.to_string()
     };
 
-    println!("DEBUG: load_icon input='{}' expanded='{}'", icon_name, expanded_name);
-            std::io::stdout().flush().unwrap();
+    std::io::stdout().flush().unwrap();
 
-            // 1) Try absolute path directly
-    if Path::new(&expanded_name).is_absolute() {
+    // 1) Try absolute path directly
+    let p_check = Path::new(&expanded_name);
+    if p_check.is_absolute() || expanded_name.starts_with('/') {
         let p = PathBuf::from(&expanded_name);
         if p.is_file() {
-                    println!("DEBUG: Found absolute file {:?}", p);
-                    match Image::load_from_path(&p) {
-                        Ok(img) => return Some(img),
-                        Err(e) => println!("DEBUG: Failed to load image from {:?}: {}", p, e),
-                    }
-                } else {
-                     println!("DEBUG: Absolute path is not a file: {:?}", p);
-                }
-            } else {
-                println!("DEBUG: Path is not absolute: {}", expanded_name);
+            println!("DEBUG: Found absolute file {:?}", p);
+            match Image::load_from_path(&p) {
+                Ok(img) => return Some(img),
+                Err(e) => println!("DEBUG: Failed to load image from {:?}: {}", p, e),
             }
+        } else {
+             println!("DEBUG: Absolute path is not a file: {:?}", p);
+             println!("DEBUG: Path bytes: {:?}", expanded_name.as_bytes());
+        }
+    } else {
+        println!("DEBUG: Path is not absolute: '{}'", expanded_name);
+        println!("DEBUG: Path bytes: {:?}", expanded_name.as_bytes());
+    }
             std::io::stdout().flush().unwrap();
 
             // 2) Try IconLoader best candidate
