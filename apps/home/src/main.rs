@@ -338,29 +338,33 @@ fn run_app(_active_window: Arc<Mutex<String>>, _active_class: Arc<Mutex<String>>
     let ui_weak_for_pad = ui.as_weak();
     let icon_loader_for_pad = icon_loader.clone();
     thread::spawn(move || {
+        let mut last_count = usize::MAX; // Force update first time
         loop {
             let count = count_gamepads();
-            let ui_weak = ui_weak_for_pad.clone();
-            let icon_loader = icon_loader_for_pad.clone();
-            let _ = slint::invoke_from_event_loop(move || {
-                if let Some(ui) = ui_weak.upgrade() {
-                    ui.set_controller_count(count as i32);
-                    // 构建重复的手柄图标
-                    let icon_opt = load_controller_icon(&icon_loader);
-                    let mut icons: Vec<PadItem> = Vec::new();
-                    for _ in 0..count {
-                        icons.push(PadItem {
-                            name: "".into(),
-                            icon: icon_opt.clone().unwrap_or_default(),
-                            exec: "".into(),
-                            app_id: "".into(),
-                            has_icon: icon_opt.is_some(),
-                        });
+            if count != last_count {
+                last_count = count;
+                let ui_weak = ui_weak_for_pad.clone();
+                let icon_loader = icon_loader_for_pad.clone();
+                let _ = slint::invoke_from_event_loop(move || {
+                    if let Some(ui) = ui_weak.upgrade() {
+                        ui.set_controller_count(count as i32);
+                        // 构建重复的手柄图标
+                        let icon_opt = load_controller_icon(&icon_loader);
+                        let mut icons: Vec<PadItem> = Vec::new();
+                        for _ in 0..count {
+                            icons.push(PadItem {
+                                name: "".into(),
+                                icon: icon_opt.clone().unwrap_or_default(),
+                                exec: "".into(),
+                                app_id: "".into(),
+                                has_icon: icon_opt.is_some(),
+                            });
+                        }
+                        let vec_model = Rc::new(VecModel::from(icons));
+                        ui.set_controller_icons(vec_model.into());
                     }
-                    let vec_model = Rc::new(VecModel::from(icons));
-                    ui.set_controller_icons(vec_model.into());
-                }
-            });
+                });
+            }
             thread::sleep(Duration::from_millis(800));
         }
     });
@@ -417,20 +421,13 @@ fn load_icon(loader: &IconLoader, icon_name: &str) -> Option<Image> {
     if p_check.is_absolute() || expanded_name.starts_with('/') {
         let p = PathBuf::from(&expanded_name);
         if p.is_file() {
-            println!("DEBUG: Found absolute file {:?}", p);
+            // println!("DEBUG: Found absolute file {:?}", p);
             match Image::load_from_path(&p) {
                 Ok(img) => return Some(img),
-                Err(e) => println!("DEBUG: Failed to load image from {:?}: {}", p, e),
+                Err(_e) => {} // println!("DEBUG: Failed to load image from {:?}: {}", p, e),
             }
-        } else {
-             println!("DEBUG: Absolute path is not a file: {:?}", p);
-             println!("DEBUG: Path bytes: {:?}", expanded_name.as_bytes());
         }
-    } else {
-        println!("DEBUG: Path is not absolute: '{}'", expanded_name);
-        println!("DEBUG: Path bytes: {:?}", expanded_name.as_bytes());
     }
-            std::io::stdout().flush().unwrap();
 
             // 2) Try IconLoader best candidate
     if let Some(p) = loader.icon_path(icon_name) {
