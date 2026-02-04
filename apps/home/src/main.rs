@@ -466,57 +466,12 @@ fn load_controller_icon(loader: &IconLoader) -> Option<Image> {
 }
 
 fn preload_runtime() {
-    let xdg_config_home = env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| {
-        let home = env::var("HOME").unwrap_or_default();
-        format!("{}/.config", home)
-    });
-    let xdg_data_home = env::var("XDG_DATA_HOME").unwrap_or_else(|_| {
-        let home = env::var("HOME").unwrap_or_default();
-        format!("{}/.local/share", home)
-    });
-    let cfg_path = format!("{}/faugus-launcher/config.ini", xdg_config_home);
-    let mut default_prefix = format!("{}/Faugus", env::var("HOME").unwrap_or_default());
-    let mut default_runner = String::from("Proton-GE Latest");
-    if let Ok(content) = fs::read_to_string(&cfg_path) {
-        for line in content.lines() {
-            if let Some(v) = line.strip_prefix("default-prefix=") {
-                default_prefix = v.trim().trim_matches('"').to_string();
-            }
-            if let Some(v) = line.strip_prefix("default-runner=") {
-                default_runner = v.trim().trim_matches('"').to_string();
-            }
-        }
-    }
-    let mut proton_flag = String::new();
-    let lr = default_runner.to_lowercase();
-    if lr.contains("ge-proton") {
-        proton_flag = String::from("--ge");
-    } else if lr.contains("proton-em") {
-        proton_flag = String::from("--em");
-    }
-    let umu_run = format!("{}/faugus-launcher/umu-run", xdg_data_home);
-    let mut parts: Vec<String> = Vec::new();
-    parts.push(String::from("python3 -m faugus.components"));
-    if !proton_flag.is_empty() {
-        parts.push(format!("python3 -m faugus.proton_downloader {}", proton_flag));
-    }
-    let mut envs: Vec<String> = Vec::new();
-    let wp = format!("{}/default", default_prefix);
-    envs.push(format!("WINEPREFIX={}", shell_quote(&wp)));
-    if lr.contains("linux-native") {
-    } else if lr.contains("cachyos") {
-        envs.push(String::from("PROTONPATH=/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"));
-    } else {
-        envs.push(format!("PROTONPATH='{}'", default_runner));
-    }
-    let env_cmd = envs.join(" ");
-    if env_cmd.is_empty() {
-        parts.push(format!("'{}' wineboot -u", umu_run));
-    } else {
-        parts.push(format!("{} '{}' wineboot -u", env_cmd, umu_run));
-    }
-    let cmd = parts.join("; ");
-    let _ = Command::new("sh").arg("-c").arg(cmd).spawn();
+    // Faugus preloading logic is temporarily disabled or needs conditional check
+    // as it seems faugus python module is missing in this environment.
+    // 
+    // let xdg_config_home = ...
+    // ...
+    // let _ = Command::new("sh").arg("-c").arg(cmd).spawn();
 }
 
 fn shell_quote(s: &str) -> String {
