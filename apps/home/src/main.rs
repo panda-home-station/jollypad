@@ -12,7 +12,8 @@ use jollypad_core::{shell, get_pad_items, CatacombClient, pad::IconLoader};
 use jollypad_core::game_launcher::{get_running_game, is_game_app};
 // use jollypad_ui::{MainWindow, PadItem};
 use std::sync::{Arc, Mutex};
-use gilrs::{Gilrs, Button, Event};
+use gilrs::{Gilrs, Button, Event, Axis};
+use std::time::Instant;
 
 slint::include_modules!();
 
@@ -384,7 +385,7 @@ fn run_app(_active_window: Arc<Mutex<String>>, _active_class: Arc<Mutex<String>>
         }
     });
 
-    // Controller Input Thread for Tab Switching
+    // Controller Input Thread for Tab Switching and Navigation
     let ui_weak_input = ui.as_weak();
     thread::spawn(move || {
         let mut gilrs = match Gilrs::new() {
@@ -395,29 +396,180 @@ fn run_app(_active_window: Arc<Mutex<String>>, _active_class: Arc<Mutex<String>>
             }
         };
         
+        // State for input polling
+        struct InputState {
+            dpad_up: bool,
+            dpad_down: bool,
+            dpad_left: bool,
+            dpad_right: bool,
+            left_stick_x: f32,
+            left_stick_y: f32,
+        }
+        
+        let mut input_state = InputState {
+            dpad_up: false,
+            dpad_down: false,
+            dpad_left: false,
+            dpad_right: false,
+            left_stick_x: 0.0,
+            left_stick_y: 0.0,
+        };
+        
+        #[derive(PartialEq, Clone, Copy, Debug)]
+        enum NavAction {
+            None,
+            Up,
+            Down,
+            Left,
+            Right,
+        }
+        
+        let mut last_nav_action = NavAction::None;
+        let mut last_nav_time = Instant::now();
+        let mut is_repeating = false;
+        
+        let initial_repeat_delay = Duration::from_millis(400); // Initial hold delay
+        let repeat_interval = Duration::from_millis(100);      // Repeat speed
+        
+        // Additional debounce for non-repeating actions like triggers/buttons
+        let mut last_button_press = Instant::now();
+        let button_debounce = Duration::from_millis(250);
+
         loop {
+            // 1. Process all pending events to update state
             while let Some(Event { id: _, event, time: _ }) = gilrs.next_event() {
+                  // DEBUG: Print all events to debug controller issues
+                  // println!("DEBUG: Input Event from {:?}: {:?}", id, event);
+                  
                   match event {
                       gilrs::EventType::ButtonPressed(Button::LeftTrigger, _) | gilrs::EventType::ButtonPressed(Button::LeftTrigger2, _) => {
-                          let ui_weak = ui_weak_input.clone();
-                          let _ = slint::invoke_from_event_loop(move || {
-                              if let Some(ui) = ui_weak.upgrade() {
-                                  ui.invoke_tab_prev();
-                              }
-                          });
+                          let now = Instant::now();
+                          if now.duration_since(last_button_press) > button_debounce {
+                              let ui_weak = ui_weak_input.clone();
+                              let _ = slint::invoke_from_event_loop(move || {
+                                  if let Some(ui) = ui_weak.upgrade() {
+                                      ui.invoke_tab_prev();
+                                  }
+                              });
+                              last_button_press = now;
+                          }
                       }
                       gilrs::EventType::ButtonPressed(Button::RightTrigger, _) | gilrs::EventType::ButtonPressed(Button::RightTrigger2, _) => {
-                          let ui_weak = ui_weak_input.clone();
-                          let _ = slint::invoke_from_event_loop(move || {
-                              if let Some(ui) = ui_weak.upgrade() {
-                                  ui.invoke_tab_next();
-                              }
-                          });
+                          let now = Instant::now();
+                          if now.duration_since(last_button_press) > button_debounce {
+                              let ui_weak = ui_weak_input.clone();
+                              let _ = slint::invoke_from_event_loop(move || {
+                                  if let Some(ui) = ui_weak.upgrade() {
+                                      ui.invoke_tab_next();
+                                  }
+                              });
+                              last_button_press = now;
+                          }
                       }
+                      gilrs::EventType::ButtonPressed(Button::South, _) => {
+                           let now = Instant::now();
+                           if now.duration_since(last_button_press) > button_debounce {
+                              let ui_weak = ui_weak_input.clone();
+                              let _ = slint::invoke_from_event_loop(move || {
+                                  if let Some(ui) = ui_weak.upgrade() {
+                                      ui.invoke_activate_selected();
+                                  }
+                              });
+                              last_button_press = now;
+                          }
+                      }
+                      
+                      // DPad State Updates
+                      gilrs::EventType::ButtonPressed(Button::DPadUp, _) => input_state.dpad_up = true,
+                      gilrs::EventType::ButtonReleased(Button::DPadUp, _) => input_state.dpad_up = false,
+                      gilrs::EventType::ButtonPressed(Button::DPadDown, _) => input_state.dpad_down = true,
+                      gilrs::EventType::ButtonReleased(Button::DPadDown, _) => input_state.dpad_down = false,
+                      gilrs::EventType::ButtonPressed(Button::DPadLeft, _) => input_state.dpad_left = true,
+                      gilrs::EventType::ButtonReleased(Button::DPadLeft, _) => input_state.dpad_left = false,
+                      gilrs::EventType::ButtonPressed(Button::DPadRight, _) => input_state.dpad_right = true,
+                      gilrs::EventType::ButtonReleased(Button::DPadRight, _) => input_state.dpad_right = false,
+                      
+                      // Stick State Updates
+                      gilrs::EventType::AxisChanged(axis, val, _) => {
+                          // println!("DEBUG: Axis {:?} val={}", axis, val);
+                          match axis {
+                              Axis::LeftStickX => input_state.left_stick_x = val,
+                              Axis::LeftStickY => input_state.left_stick_y = val,
+                              _ => {}
+                          }
+                      }
+                      
                       _ => {}
                   }
              }
-            thread::sleep(Duration::from_millis(50));
+             
+             // 2. Determine Current Intent based on State
+             let mut current_intent = NavAction::None;
+             let stick_threshold = 0.5;
+             
+             // Debug print if stick is moved significantly but maybe not enough or weird values
+             // if input_state.left_stick_x.abs() > 0.1 || input_state.left_stick_y.abs() > 0.1 {
+             //    println!("DEBUG: Sticks: LX={:.2} LY={:.2}", input_state.left_stick_x, input_state.left_stick_y);
+             // }
+             
+             // Logic: Combine DPad and Stick. Stick takes precedence if moved.
+             // Standard Gamepad: Up is negative Y (-1.0), Down is positive Y (1.0).
+             // Right is positive X (1.0), Left is negative X (-1.0).
+             
+             if input_state.dpad_up || input_state.left_stick_y < -stick_threshold {
+                 current_intent = NavAction::Up;
+             } else if input_state.dpad_down || input_state.left_stick_y > stick_threshold {
+                 current_intent = NavAction::Down;
+             } else if input_state.dpad_left || input_state.left_stick_x < -stick_threshold {
+                 current_intent = NavAction::Left;
+             } else if input_state.dpad_right || input_state.left_stick_x > stick_threshold {
+                 current_intent = NavAction::Right;
+             }
+             
+             // 3. Handle Repeat Logic
+             let now = Instant::now();
+             let mut should_trigger = false;
+             
+             if current_intent != NavAction::None {
+                 if current_intent != last_nav_action {
+                     // New action started
+                     should_trigger = true;
+                     last_nav_action = current_intent;
+                     last_nav_time = now;
+                     is_repeating = false;
+                 } else {
+                     // Holding same action
+                     let delay = if is_repeating { repeat_interval } else { initial_repeat_delay };
+                     if now.duration_since(last_nav_time) > delay {
+                         should_trigger = true;
+                         last_nav_time = now;
+                         is_repeating = true;
+                     }
+                 }
+             } else {
+                 // No action
+                 last_nav_action = NavAction::None;
+                 is_repeating = false;
+             }
+             
+             // 4. Execute Action
+             if should_trigger {
+                 let ui_weak = ui_weak_input.clone();
+                 let action = last_nav_action; // Copy for closure
+                 let _ = slint::invoke_from_event_loop(move || {
+                     if let Some(ui) = ui_weak.upgrade() {
+                         match action {
+                             NavAction::Up => ui.invoke_navigate_up(),
+                             NavAction::Down => ui.invoke_navigate_down(),
+                             NavAction::Left => ui.invoke_navigate_left(),
+                             NavAction::Right => ui.invoke_navigate_right(),
+                             _ => {}
+                         }
+                     }
+                 });
+             }
+             
+             thread::sleep(Duration::from_millis(16));
         }
     });
 

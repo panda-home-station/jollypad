@@ -39,6 +39,10 @@ export component MainWindow inherits Window {
     callback on-pad-action(string, string, string);
     callback on-island-action(string);
     callback activate-selected();
+    callback navigate-up();
+    callback navigate-down();
+    callback navigate-left();
+    callback navigate-right();
 
     no-frame: true;
     background: Theme.background;
@@ -225,6 +229,11 @@ export component MainWindow inherits Window {
             pad.activate-selected();
         }
     }
+
+    navigate-up => { pad.navigate-up(); }
+    navigate-down => { pad.navigate-down(); }
+    navigate-left => { pad.navigate-left(); }
+    navigate-right => { pad.navigate-right(); }
 
     Rectangle {
         x: 0px;
