@@ -247,7 +247,7 @@ fn setup_key_bindings() -> Result<()> {
 fn setup_roles() -> Result<()> {
     send(IpcMessage::SystemRole {
         role: "nav".to_string(),
-        app_id: "(?i)jellyfin.*".to_string(),
+        app_id: "(?i).*jellyfin.*".to_string(),
     })?;
     Ok(())
 }

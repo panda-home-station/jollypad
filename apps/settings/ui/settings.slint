@@ -63,6 +63,151 @@ export component SettingsWindow inherits Window {
     callback confirm-resolution();
     callback revert-resolution();
 
+    public function navigate-up() {
+        if (root.show-confirmation-popup) {
+            return;
+        }
+        if (root.show-resolution-popup) {
+            if (root.resolution-popup-index > 0) { 
+                root.resolution-popup-index -= 1; 
+                if (root.resolution-popup-index * 60px < -root.res-viewport-y) {
+                    root.res-viewport-y = -root.resolution-popup-index * 60px;
+                }
+            }
+            return;
+        }
+        if (root.show-scale-popup) {
+            if (root.popup-index > 0) { root.popup-index -= 1; }
+            return;
+        }
+        if (root.sidebar-focus) {
+            if (root.selected-index > 0) { root.selected-index -= 1; }
+            return;
+        } else {
+            if (root.content-index > 0) { root.content-index -= 1; }
+            return;
+        }
+    }
+
+    public function navigate-down() {
+        if (root.show-confirmation-popup) {
+            return;
+        }
+        if (root.show-resolution-popup) {
+            if (root.resolution-popup-index < root.resolution-options.length - 1) { 
+                root.resolution-popup-index += 1; 
+                if ((root.resolution-popup-index + 1) * 60px > -root.res-viewport-y + 280px) {
+                        root.res-viewport-y = 280px - (root.resolution-popup-index + 1) * 60px;
+                }
+            }
+            return;
+        }
+        if (root.show-scale-popup) {
+            if (root.popup-index < root.scale-options.length - 1) { root.popup-index += 1; }
+            return;
+        }
+        if (root.sidebar-focus) {
+            if (root.selected-index < 5) { root.selected-index += 1; }
+            return;
+        } else {
+            // Adjust max index based on active page
+            if (root.selected-index == 2 && root.content-index < 1) { root.content-index += 1; }
+            return;
+        }
+    }
+
+    public function navigate-left() {
+        if (root.show-confirmation-popup) {
+            root.confirmation-index = 0;
+            return;
+        }
+        if (root.show-resolution-popup || root.show-scale-popup) {
+            return;
+        }
+        if (!root.sidebar-focus) {
+            root.sidebar-focus = true;
+        }
+    }
+
+    public function navigate-right() {
+        if (root.show-confirmation-popup) {
+            root.confirmation-index = 1;
+            return;
+        }
+        if (root.show-resolution-popup || root.show-scale-popup) {
+            return;
+        }
+        if (root.sidebar-focus) {
+            if (root.selected-index == 5) { // Close button
+                    root.close-requested();
+            } else {
+                    root.sidebar-focus = false;
+                    root.content-index = 0;
+            }
+        }
+    }
+
+    public function activate() {
+        if (root.show-confirmation-popup) {
+            if (root.confirmation-index == 0) {
+                root.confirm-resolution();
+            } else {
+                root.revert-resolution();
+            }
+            return;
+        }
+        if (root.show-resolution-popup) {
+            root.apply-resolution(root.resolution-popup-index);
+            root.show-resolution-popup = false;
+            root.show-confirmation-popup = true;
+            root.confirmation-index = 0;
+            return;
+        }
+        if (root.show-scale-popup) {
+            root.apply-scale(root.popup-index);
+            root.show-scale-popup = false;
+            return;
+        }
+        if (root.sidebar-focus) {
+            if (root.selected-index == 5) { // Close button
+                    root.close-requested();
+            } else {
+                    root.sidebar-focus = false;
+                    root.content-index = 0;
+            }
+        } else {
+            // Activate item
+            if (root.selected-index == 2) {
+                if (root.content-index == 0) { // Resolution
+                    root.show-resolution-popup = true;
+                }
+                if (root.content-index == 1) { // Scale
+                    root.show-scale-popup = true;
+                }
+            }
+        }
+    }
+
+    public function back() {
+        if (root.show-confirmation-popup) {
+            root.revert-resolution();
+            return;
+        }
+        if (root.show-resolution-popup) {
+            root.show-resolution-popup = false;
+            return;
+        }
+        if (root.show-scale-popup) {
+            root.show-scale-popup = false;
+            return;
+        }
+        if (root.sidebar-focus) {
+            root.close-requested();
+        } else {
+            root.sidebar-focus = true;
+        }
+    }
+
     no-frame: true;
     background: #1e1e1e;
     title: "JollyPad-Settings";
@@ -70,146 +215,21 @@ export component SettingsWindow inherits Window {
 
     main-scope := FocusScope {
         key-pressed(event) => {
-            // Confirmation Popup Navigation
-            if (root.show-confirmation-popup) {
-                if (event.text == Key.LeftArrow) {
-                    root.confirmation-index = 0;
-                    return accept;
-                }
-                if (event.text == Key.RightArrow) {
-                    root.confirmation-index = 1;
-                    return accept;
-                }
-                if (event.text == Key.Return) {
-                    if (root.confirmation-index == 0) {
-                        root.confirm-resolution();
-                    } else {
-                        root.revert-resolution();
-                    }
-                    return accept;
-                }
-                if (event.text == Key.Escape) {
-                    root.revert-resolution();
-                    return accept;
-                }
-                return accept; // Block all other input
-            }
-
-            // Popup Navigation (Resolution)
-            if (root.show-resolution-popup) {
-                if (event.text == Key.UpArrow) {
-                    if (root.resolution-popup-index > 0) { 
-                        root.resolution-popup-index -= 1; 
-                        if (root.resolution-popup-index * 60px < -root.res-viewport-y) {
-                            root.res-viewport-y = -root.resolution-popup-index * 60px;
-                        }
-                    }
-                    return accept;
-                }
-                if (event.text == Key.DownArrow) {
-                    if (root.resolution-popup-index < root.resolution-options.length - 1) { 
-                        root.resolution-popup-index += 1; 
-                        if ((root.resolution-popup-index + 1) * 60px > -root.res-viewport-y + 280px) {
-                             root.res-viewport-y = 280px - (root.resolution-popup-index + 1) * 60px;
-                        }
-                    }
-                    return accept;
-                }
-                if (event.text == Key.Return) {
-                    root.apply-resolution(root.resolution-popup-index);
-                    root.show-resolution-popup = false;
-                    root.show-confirmation-popup = true;
-                    root.confirmation-index = 0;
-                    return accept;
-                }
-                if (event.text == Key.Escape) {
-                    root.show-resolution-popup = false;
-                    return accept;
-                }
+            if (event.text == Key.UpArrow) { root.navigate-up(); return accept; }
+            if (event.text == Key.DownArrow) { root.navigate-down(); return accept; }
+            if (event.text == Key.LeftArrow) { root.navigate-left(); return accept; }
+            if (event.text == Key.RightArrow) { root.navigate-right(); return accept; }
+            if (event.text == Key.Return) { root.activate(); return accept; }
+            if (event.text == Key.Escape) { root.back(); return accept; }
+            
+            // Block other inputs if popup is shown
+            if (root.show-confirmation-popup || root.show-resolution-popup || root.show-scale-popup) {
                 return accept;
             }
-
-            // Popup Navigation (Scale)
-            if (root.show-scale-popup) {
-                if (event.text == Key.UpArrow) {
-                    if (root.popup-index > 0) { root.popup-index -= 1; }
-                    return accept;
-                }
-                if (event.text == Key.DownArrow) {
-                    if (root.popup-index < root.scale-options.length - 1) { root.popup-index += 1; }
-                    return accept;
-                }
-                if (event.text == Key.Return) {
-                    root.apply-scale(root.popup-index);
-                    root.show-scale-popup = false;
-                    return accept;
-                }
-                if (event.text == Key.Escape) {
-                    root.show-scale-popup = false;
-                    return accept;
-                }
-                return accept; // Consume other keys in popup
-            }
-        
-            // Sidebar Navigation
-            if (root.sidebar-focus) {
-                if (event.text == Key.UpArrow) {
-                    if (root.selected-index > 0) { root.selected-index -= 1; }
-                    return accept;
-                }
-                if (event.text == Key.DownArrow) {
-                    if (root.selected-index < 5) { root.selected-index += 1; }
-                    return accept;
-                }
-                if (event.text == Key.RightArrow || event.text == Key.Return) {
-                    if (root.selected-index == 5) { // Close button
-                         root.close-requested();
-                    } else {
-                         root.sidebar-focus = false;
-                         root.content-index = 0;
-                    }
-                    return accept;
-                }
-                if (event.text == Key.Escape) {
-                    root.close-requested();
-                    return accept;
-                }
-            } 
-            // Content Navigation
-            else {
-                if (event.text == Key.UpArrow) {
-                    if (root.content-index > 0) { root.content-index -= 1; }
-                    return accept;
-                }
-                if (event.text == Key.DownArrow) {
-                    // Adjust max index based on active page
-                    if (root.selected-index == 2 && root.content-index < 1) { root.content-index += 1; }
-                    return accept;
-                }
-                if (event.text == Key.LeftArrow) {
-                    root.sidebar-focus = true;
-                    return accept;
-                }
-                if (event.text == Key.Escape) {
-                    root.sidebar-focus = true;
-                    return accept;
-                }
-                if (event.text == Key.Return) {
-                    // Activate item
-                    if (root.selected-index == 2) {
-                        if (root.content-index == 0) { // Resolution
-                            root.show-resolution-popup = true;
-                        }
-                        if (root.content-index == 1) { // Scale
-                            root.show-scale-popup = true;
-                            // Initialize popup index? logic needed in rust or here
-                        }
-                    }
-                    return accept;
-                }
-            }
+            
             return reject;
         }
+
     
         HorizontalLayout {
             padding: Theme.padding;
