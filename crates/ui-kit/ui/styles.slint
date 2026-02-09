@@ -1,9 +1,10 @@
 export global Theme {
-    out property <color> background: rgba(0, 0, 0, 0.0);
-    out property <color> card-bg: rgba(255, 255, 255, 0.08);
-    out property <color> card-hover: rgba(255, 255, 255, 0.15);
+    out property <brush> background: @linear-gradient(180deg, #0b0b0b 0%, #1a1a2e 100%);
+    out property <color> card-bg: rgba(255, 255, 255, 0.05);
+    out property <color> card-hover: rgba(255, 255, 255, 0.1);
+    out property <color> focus-color: #3b82f6; // PS5 Blue-ish
     out property <color> text-color: #ffffff;
-    out property <length> icon-size: 64px;
-    out property <length> padding: 20px;
-    out property <length> border-radius: 12px;
+    out property <length> icon-size: 80px; // Slightly larger
+    out property <length> padding: 24px;
+    out property <length> border-radius: 16px;
 }

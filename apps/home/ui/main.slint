@@ -6,13 +6,25 @@ export { PadItem }
 
 // 1. Full Dashboard (Original)
 export component MainWindow inherits Window {
-    in property <[PadItem]> pad-items;
+    in property <[PadItem]> items-all;
+    in property <[PadItem]> items-games;
+    in property <[PadItem]> items-media;
+    
+    // Derived property for current view
+    private property <[PadItem]> current-items: root.current-tab == 1 ? root.items-games : (root.current-tab == 2 ? root.items-media : root.items-all);
+
     in property <[PadItem]> island-windows;
     in property <int> controller-count: 0;
     in property <bool> has-controller-icon: false;
     in property <image> controller-icon;
     in property <[PadItem]> controller-icons;
     in-out property <int> selected-index: 0;
+    
+    // Tab State: 0=All, 1=Games, 2=Media
+    in-out property <int> current-tab: 0;
+    callback tab-next();
+    callback tab-prev();
+    
     in property <string> user-name;
     in property <bool> has-user-avatar;
     in property <image> user-avatar;
@@ -29,20 +41,21 @@ export component MainWindow inherits Window {
     callback activate-selected();
 
     no-frame: true;
-    background: transparent;
+    background: Theme.background;
     title: "JollyPad-Desktop";
     forward-focus: pad;
     
     // 顶部“灵动岛”
     island := Rectangle {
         x: (root.width - self.width) / 2;
-        y: 16px;
-        width: 560px;
-        height: 64px;
-        background: rgba(32, 32, 34, 0.45);
-        border-radius: 32px;
+        y: 32px;
+        width: 600px;
+        height: 80px;
+        visible: false; // Hidden as requested
+        background: Theme.card-bg;
+        border-radius: 40px;
         border-width: 1px;
-        border-color: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.1);
         clip: true;
         HorizontalLayout {
             padding-left: 16px;
@@ -116,22 +129,94 @@ export component MainWindow inherits Window {
         }
     }
     
-    // App Grid area
+    // Navigation Tabs
+    HorizontalLayout {
+        x: 80px;
+        y: 60px;
+        spacing: 24px;
+        height: 80px;
+        alignment: start;
+        
+        Rectangle {
+            width: 300px;
+            background: transparent;
+            Text {
+                text: "全部应用";
+                color: Theme.text-color;
+                opacity: root.current-tab == 0 ? 1.0 : 0.5;
+                font-size: root.current-tab == 0 ? 64px : 48px; // Increased font size
+                font-weight: root.current-tab == 0 ? 700 : 500;
+                vertical-alignment: center;
+                y: (parent.height - self.height) / 2;
+            }
+        }
+        
+        Rectangle {
+            width: 150px;
+            background: transparent;
+            Text {
+                text: "游戏";
+                color: Theme.text-color;
+                opacity: root.current-tab == 1 ? 1.0 : 0.5;
+                font-size: root.current-tab == 1 ? 64px : 48px;
+                font-weight: root.current-tab == 1 ? 700 : 500;
+                vertical-alignment: center;
+                y: (parent.height - self.height) / 2;
+            }
+        }
+
+        Rectangle {
+            width: 150px;
+            background: transparent;
+            Text {
+                text: "媒体";
+                color: Theme.text-color;
+                opacity: root.current-tab == 2 ? 1.0 : 0.5;
+                font-size: root.current-tab == 2 ? 64px : 48px;
+                font-weight: root.current-tab == 2 ? 700 : 500;
+                vertical-alignment: center;
+                y: (parent.height - self.height) / 2;
+            }
+        }
+    }
+
     Rectangle {
         x: 0px;
-        y: island.y + island.height + 16px;
+        y: 120px;
         width: root.width;
-        height: root.height - (island.y + island.height) - 16px - 24px;
+        height: 400px; // Height restricted to keep icons at the top
         background: transparent;
         pad := PadGrid {
             x: 0px;
             y: 0px;
             width: parent.width;
             height: parent.height;
-            items: root.pad-items;
+            items: root.current-items;
             selected-index: root.selected-index >= 0 ? root.selected-index : -1;
             columns: 6;
+            single-row: true;
             item-clicked(exec, name, app-id) => { root.on-pad-action(exec, name, app-id); }
+        }
+    }
+    
+    // Tab switching logic
+    tab-next => {
+        if (root.current-tab < 2) {
+            root.current-tab += 1;
+            root.selected-index = 0; // Reset selection
+        } else {
+            root.current-tab = 0; // Cycle
+            root.selected-index = 0;
+        }
+    }
+    
+    tab-prev => {
+        if (root.current-tab > 0) {
+            root.current-tab -= 1;
+            root.selected-index = 0;
+        } else {
+            root.current-tab = 2; // Cycle
+            root.selected-index = 0;
         }
     }
     

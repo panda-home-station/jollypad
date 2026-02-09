@@ -2,7 +2,7 @@ import { Theme } from "styles.slint";
 import { VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { PadItem } from "types.slint";
 
-export component PadGrid inherits Rectangle {
+export component PadGrid inherits FocusScope {
     in property <[PadItem]> items;
     callback item-clicked(string, string, string); // exec, name, app-id
     in-out property <int> selected-index: 0;
@@ -12,51 +12,56 @@ export component PadGrid inherits Rectangle {
     in property <bool> hide-text: false; // Hide text label
     callback activate-selected();
 
-    background: transparent;
+    // Use a rectangle for background since FocusScope has no visual representation
+    Rectangle {
+        background: transparent;
+    }
+    
+    // forward-focus: touch-handler; // No longer needed if PadGrid inherits FocusScope?
+    // Actually, if PadGrid is a FocusScope, it can accept focus directly.
+    // But we have a touch-handler inside. 
+    // Let's keep the logic inside key-pressed handler on the root FocusScope (PadGrid itself).
 
-    forward-focus: touch-handler;
-    touch-handler := FocusScope {
-        key-pressed(event) => {
-            if (event.text == Key.UpArrow) {
-                if (!root.single-row) {
-                    if (root.selected-index >= root.columns) {
-                        root.selected-index -= root.columns;
-                    }
+    key-pressed(event) => {
+        if (event.text == Key.UpArrow) {
+            if (!root.single-row) {
+                if (root.selected-index >= root.columns) {
+                    root.selected-index -= root.columns;
                 }
-                return accept;
             }
-            if (event.text == Key.DownArrow) {
-                if (!root.single-row) {
-                    if (root.selected-index + root.columns < root.items.length) {
-                        root.selected-index += root.columns;
-                    }
-                }
-                return accept;
-            }
-            if (event.text == Key.LeftArrow) {
-                if (root.selected-index > 0) {
-                    root.selected-index -= 1;
-                }
-                return accept;
-            }
-            if (event.text == Key.RightArrow) {
-                if (root.selected-index < root.items.length - 1) {
-                    root.selected-index += 1;
-                }
-                return accept;
-            }
-            if (event.text == Key.Return) {
-                root.activate-selected();
-                return accept;
-            }
-            reject
+            return accept;
         }
+        if (event.text == Key.DownArrow) {
+            if (!root.single-row) {
+                if (root.selected-index + root.columns < root.items.length) {
+                    root.selected-index += root.columns;
+                }
+            }
+            return accept;
+        }
+        if (event.text == Key.LeftArrow) {
+            if (root.selected-index > 0) {
+                root.selected-index -= 1;
+            }
+            return accept;
+        }
+        if (event.text == Key.RightArrow) {
+            if (root.selected-index < root.items.length - 1) {
+                root.selected-index += 1;
+            }
+            return accept;
+        }
+        if (event.text == Key.Return) {
+            root.activate-selected();
+            return accept;
+        }
+        reject
     }
     
     // Auto-scroll calculation for single row
-    property <length> item-w: (root.single-row) ? 144px : (root.width - (root.columns + 1) * 20px) / root.columns;
-    property <length> item-h: (root.single-row) ? 144px : 180px;
-    property <length> item-gap: 20px;
+    property <length> item-w: (root.single-row) ? 220px : (root.width - (root.columns + 1) * 20px) / root.columns;
+    property <length> item-h: (root.single-row) ? 220px : 180px;
+    property <length> item-gap: 100px; // Increased gap for larger scale
     
     // Calculate target scroll position to keep selected item in view
     // Center the selected item: selected-x - width/2 + item-w/2
@@ -74,19 +79,28 @@ export component PadGrid inherits Rectangle {
         animate viewport-x { duration: 200ms; easing: cubic-bezier(0.2, 0.0, 0.0, 1.0); }
         
         for item[i] in items : Rectangle {
-            width: root.item-w;
-            height: root.item-h;
+            // Scale simulation logic
+            property <float> active-scale: (i == root.selected-index) ? 1.50 : 1.0; // Increased scale to 1.5
+            animate active-scale { duration: 250ms; easing: cubic-bezier(0.2, 0.8, 0.2, 1.0); }
+
+            width: root.item-w * active-scale;
+            height: root.item-h * active-scale;
             
-            x: root.single-row ? 
+            // Adjust x and y to center the scaled item
+            x: (root.single-row ? 
                (i * (root.item-w + root.item-gap) + root.item-gap) : 
-               (mod(i, root.columns) * (root.item-w + 20px) + 20px);
+               (mod(i, root.columns) * (root.item-w + 20px) + 20px)) - (self.width - root.item-w) / 2;
                
-            y: root.single-row ? 
-               (parent.height - self.height) / 2 : 
-               (floor(i / root.columns) * (self.height + 20px) + 20px);
+            y: (root.single-row ? 
+               (parent.height - root.item-h) / 2 : 
+               (floor(i / root.columns) * (root.item-h + 20px) + 20px)) - (self.height - root.item-h) / 2;
             
             background: (i == root.selected-index) ? Theme.card-hover : (touch.pressed ? Theme.card-hover : transparent);
             border-radius: Theme.border-radius;
+            border-width: (i == root.selected-index) ? 2px : 0px;
+            border-color: Theme.focus-color;
+            
+            // z: (i == root.selected-index) ? 100 : 1; // Removed due to compilation error
             
             touch := TouchArea {
                 clicked => { root.item-clicked(item.exec, item.name, item.app-id); }
@@ -127,8 +141,8 @@ export component PadGrid inherits Rectangle {
 
             // Home Mode: Standard Layout (Icon centered, or Text if no icon)
             if (!root.is-overview && item.has-icon) : Image {
-                width: 128px;
-                height: 128px;
+                width: (root.single-row ? 180px : 128px) * parent.active-scale;
+                height: (root.single-row ? 180px : 128px) * parent.active-scale;
                 x: (parent.width - self.width) / 2;
                 y: (parent.height - self.height) / 2;
                 source: item.icon;
@@ -137,7 +151,7 @@ export component PadGrid inherits Rectangle {
             if (!root.is-overview && !item.has-icon) : Text {
                 text: item.name;
                 color: Theme.text-color;
-                font-size: 24px;
+                font-size: 24px * parent.active-scale;
                 wrap: word-wrap;
                 horizontal-alignment: center;
                 vertical-alignment: center;

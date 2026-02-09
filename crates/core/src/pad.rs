@@ -11,6 +11,7 @@ pub struct AppItem {
     pub icon: String, // icon name or absolute path
     pub exec: String,
     pub app_id: String,
+    pub category: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -168,7 +169,8 @@ fn parse_ini_app(content: &str, default_app_id: &str) -> Option<AppItem> {
     let mut name = String::new();
     let mut icon = String::new();
     let mut exec = String::new();
-    let mut app_id = String::new();
+    let mut category = String::new();
+    let app_id = String::new();
     
     for line in content.lines() {
         let trimmed_line = line.trim().trim_matches('\u{FEFF}');
@@ -205,6 +207,7 @@ fn parse_ini_app(content: &str, default_app_id: &str) -> Option<AppItem> {
                 "Name" => name = val.to_string(),
                 "Icon" => icon = val.to_string(),
                 "Exec" => exec = val.to_string(),
+                "Category" => category = val.to_string(),
                 "Type" => {
                     if val.eq_ignore_ascii_case("Game") {
                         is_game_type = true;
@@ -224,12 +227,19 @@ fn parse_ini_app(content: &str, default_app_id: &str) -> Option<AppItem> {
     if is_game_type {
         // exec = format!("game-launcher {} run", final_app_id);
         exec = format!("game-launcher {}", final_app_id);
+        if category.is_empty() {
+            category = "Game".to_string();
+        }
     }
     
-    println!("DEBUG: Finished parsing '{}'. Name='{}', Exec='{}', is_game={}", final_app_id, name, exec, is_game_type);
+    if category.is_empty() {
+        category = "App".to_string();
+    }
+    
+    println!("DEBUG: Finished parsing '{}'. Name='{}', Exec='{}', is_game={}, category='{}'", final_app_id, name, exec, is_game_type, category);
 
     if !name.is_empty() && !exec.is_empty() {
-        Some(AppItem { name, icon, exec, app_id: final_app_id })
+        Some(AppItem { name, icon, exec, app_id: final_app_id, category })
     } else {
         println!("DEBUG: App rejected due to empty name or exec");
         None

@@ -2954,6 +2954,7 @@ name = "jolly-home"
 version = "0.1.0"
 dependencies = [
  "env_logger",
+ "gilrs 0.10.10",
  "jollypad-core",
  "jollypad-ui-kit",
  "log",

@@ -6,14 +6,13 @@ use std::thread;
 use std::time::Duration;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::fs;
 use std::env;
-use std::process::Command;
 
 use jollypad_core::{shell, get_pad_items, CatacombClient, pad::IconLoader};
 use jollypad_core::game_launcher::{get_running_game, is_game_app};
 // use jollypad_ui::{MainWindow, PadItem};
 use std::sync::{Arc, Mutex};
+use gilrs::{Gilrs, Button, Event};
 
 slint::include_modules!();
 
@@ -121,19 +120,35 @@ fn run_app(_active_window: Arc<Mutex<String>>, _active_class: Arc<Mutex<String>>
     // User info
     let (user_name, user_avatar, user_initial) = get_user_info();
 
-    let pad_model: Rc<VecModel<PadItem>> = Rc::new(VecModel::default());
+    let pad_model_all: Rc<VecModel<PadItem>> = Rc::new(VecModel::default());
+    let pad_model_games: Rc<VecModel<PadItem>> = Rc::new(VecModel::default());
+    let pad_model_media: Rc<VecModel<PadItem>> = Rc::new(VecModel::default());
+
     for item in &pad_items_data {
         let icon_opt = load_icon(&icon_loader, &item.icon);
-        pad_model.push(PadItem {
+        let pad_item = PadItem {
             name: item.name.clone().into(),
             icon: icon_opt.clone().unwrap_or_default(),
             exec: item.exec.clone().into(),
             app_id: item.app_id.clone().into(),
             has_icon: icon_opt.is_some(),
-        });
+        };
+        
+        pad_model_all.push(pad_item.clone());
+        
+        if item.category == "Game" || is_game_app(&item.app_id).unwrap_or(false) {
+            pad_model_games.push(pad_item.clone());
+        }
+        
+        if item.category == "Media" || item.category == "Audio" || item.category == "Video" 
+           || item.app_id.contains("player") || item.app_id.contains("music") || item.app_id.contains("video") {
+             pad_model_media.push(pad_item.clone());
+        }
     }
 
-    ui.set_pad_items(pad_model.into());
+    ui.set_items_all(pad_model_all.into());
+    ui.set_items_games(pad_model_games.into());
+    ui.set_items_media(pad_model_media.into());
     ui.set_user_name(user_name.into());
     ui.set_has_user_avatar(user_avatar.is_some());
     if let Some(img) = user_avatar {
@@ -369,6 +384,43 @@ fn run_app(_active_window: Arc<Mutex<String>>, _active_class: Arc<Mutex<String>>
         }
     });
 
+    // Controller Input Thread for Tab Switching
+    let ui_weak_input = ui.as_weak();
+    thread::spawn(move || {
+        let mut gilrs = match Gilrs::new() {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("Failed to init gilrs: {}", e);
+                return;
+            }
+        };
+        
+        loop {
+            while let Some(Event { id: _, event, time: _ }) = gilrs.next_event() {
+                  match event {
+                      gilrs::EventType::ButtonPressed(Button::LeftTrigger, _) | gilrs::EventType::ButtonPressed(Button::LeftTrigger2, _) => {
+                          let ui_weak = ui_weak_input.clone();
+                          let _ = slint::invoke_from_event_loop(move || {
+                              if let Some(ui) = ui_weak.upgrade() {
+                                  ui.invoke_tab_prev();
+                              }
+                          });
+                      }
+                      gilrs::EventType::ButtonPressed(Button::RightTrigger, _) | gilrs::EventType::ButtonPressed(Button::RightTrigger2, _) => {
+                          let ui_weak = ui_weak_input.clone();
+                          let _ = slint::invoke_from_event_loop(move || {
+                              if let Some(ui) = ui_weak.upgrade() {
+                                  ui.invoke_tab_next();
+                              }
+                          });
+                      }
+                      _ => {}
+                  }
+             }
+            thread::sleep(Duration::from_millis(50));
+        }
+    });
+
     ui.run()
 }
 
@@ -472,14 +524,6 @@ fn preload_runtime() {
     // let xdg_config_home = ...
     // ...
     // let _ = Command::new("sh").arg("-c").arg(cmd).spawn();
-}
-
-fn shell_quote(s: &str) -> String {
-    if s.contains('\'') || s.contains(' ') {
-        format!("'{}'", s.replace('\'', "'\"'\"'"))
-    } else {
-        s.to_string()
-    }
 }
 
 fn resolve_icon_path(icon_name: &str) -> Option<std::path::PathBuf> {
