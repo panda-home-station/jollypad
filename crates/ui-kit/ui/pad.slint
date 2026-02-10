@@ -163,14 +163,20 @@ export component PadGrid inherits FocusScope {
     }
 
     public function navigate-left() {
+        debug("navigate-left: index=" + root.selected-index + ", items=" + root.items.length);
         if (root.selected-index > 0) {
             root.selected-index -= 1;
+        } else {
+            debug("navigate-left: blocked at start");
         }
     }
 
     public function navigate-right() {
+        debug("navigate-right: index=" + root.selected-index + ", items=" + root.items.length);
         if (root.selected-index < root.items.length - 1) {
             root.selected-index += 1;
+        } else {
+            debug("navigate-right: blocked at end");
         }
     }
 }

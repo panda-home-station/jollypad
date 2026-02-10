@@ -220,22 +220,22 @@ export component MainWindow inherits Window {
     
     // Tab switching logic
     tab-next => {
+        debug("tab-next called. current-tab=" + root.current-tab);
         if (root.current-tab < 2) {
             root.current-tab += 1;
             root.selected-index = 0; // Reset selection
         } else {
-            root.current-tab = 0; // Cycle
-            root.selected-index = 0;
+            debug("tab-next blocked. Max tab reached.");
         }
     }
     
     tab-prev => {
+        debug("tab-prev called. current-tab=" + root.current-tab);
         if (root.current-tab > 0) {
             root.current-tab -= 1;
             root.selected-index = 0;
         } else {
-            root.current-tab = 2; // Cycle
-            root.selected-index = 0;
+            debug("tab-prev blocked. Min tab reached.");
         }
     }
     
