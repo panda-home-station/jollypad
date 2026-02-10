@@ -197,6 +197,7 @@ export component MainWindow inherits Window {
             height: parent.height;
 
             key-pressed(event) => {
+                debug("Key Pressed: " + event.text);
                 if (event.text == Key.PageUp) { root.tab-prev(); return accept; }
                 if (event.text == Key.PageDown) { root.tab-next(); return accept; }
                 if (event.text == Key.Escape) { root.on-cancel(); return accept; }
