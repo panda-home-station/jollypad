@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 slint = "1.8"
-gilrs = "0.10"
 jollypad-core = { path = "../../crates/core" }
 jollypad-ui-kit = { path = "../../crates/ui-kit" }
 i-slint-backend-winit = "1.8"

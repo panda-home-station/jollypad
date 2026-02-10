@@ -170,43 +170,7 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
 
-    // Gamepad Input Support
-    {
-        let ui_weak = ui.as_weak();
-        std::thread::spawn(move || {
-            use gilrs::{Gilrs, Button, Event, EventType};
-            
-            let mut gilrs = match Gilrs::new() {
-                Ok(g) => g,
-                Err(e) => {
-                    eprintln!("Failed to initialize Gilrs: {}", e);
-                    return;
-                }
-            };
-
-            loop {
-                while let Some(Event { event, .. }) = gilrs.next_event() {
-                    if let EventType::ButtonPressed(button, _) = event {
-                        let ui_weak = ui_weak.clone();
-                        let _ = slint::invoke_from_event_loop(move || {
-                            if let Some(ui) = ui_weak.upgrade() {
-                                match button {
-                                    Button::DPadUp => ui.invoke_navigate_up(),
-                                    Button::DPadDown => ui.invoke_navigate_down(),
-                                    Button::DPadLeft => ui.invoke_navigate_left(),
-                                    Button::DPadRight => ui.invoke_navigate_right(),
-                                    Button::South => ui.invoke_activate(), // A
-                                    Button::East => ui.invoke_back(),      // B
-                                    _ => {}
-                                }
-                            }
-                        });
-                    }
-                }
-                std::thread::sleep(std::time::Duration::from_millis(16));
-            }
-        });
-    }
+    // Gamepad Input Support (Removed - now handled by Catacomb via System Role)
 
     ui.run()
 }
