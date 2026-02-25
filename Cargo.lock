@@ -2911,6 +2911,7 @@ name = "jolly-launcher"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "catacomb",
  "catacomb_ipc",
  "clap",
  "dirs 5.0.1",

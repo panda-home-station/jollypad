@@ -1,0 +1,10 @@
+Package: jollypad
+Version: 0.1.0
+Section: games
+Priority: optional
+Architecture: amd64
+Maintainer: PHS
+Depends: libasound2, libudev1, libinput10, libgbm1, libdrm2, libseat1, libxkbcommon0
+Description: PHS Game Console Interface (JollyPad)
+ This package provides the JollyPad game console interface, running as a
+ standalone Wayland compositor session.
