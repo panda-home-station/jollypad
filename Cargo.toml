@@ -21,3 +21,6 @@ default-members = [
     "apps/nav",
     "apps/settings",
 ]
+
+[workspace.lints.rust]
+warnings = "deny"

@@ -12,3 +12,6 @@ catacomb_ipc = { path = "../../crates/ipc" }
 
 [build-dependencies]
 slint-build = "1.8"
+
+[lints.rust]
+warnings = "deny"
