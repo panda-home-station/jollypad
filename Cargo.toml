@@ -12,3 +12,12 @@ members = [
     "apps/launcher",
     "apps/debug",
 ]
+
+# Limit default build set when running `cargo build` at the workspace root.
+# This way, a plain `cargo build --release`会只构建这些应用与其依赖。
+default-members = [
+    "apps/launcher",
+    "apps/home",
+    "apps/nav",
+    "apps/settings",
+]

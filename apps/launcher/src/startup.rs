@@ -265,37 +265,78 @@ fn spawn_apps() -> Result<()> {
     // Command::new("squeekboard").spawn()?;
 
     // Jolly Home
-    // We can just try to spawn jolly-home, assuming it is in PATH
-    let log_path = if let Ok(home) = std::env::var("HOME") {
-        format!("{}/jolly-home.log", home)
-    } else {
-        "/tmp/jolly-home.log".to_string()
-    };
-    println!("📝 Jolly Home logs will be written to: {}", log_path);
+    // Resolve log path
+    let base_state = std::env::var("XDG_STATE_HOME")
+        .ok()
+        .map(std::path::PathBuf::from)
+        .or_else(|| {
+            dirs::home_dir().map(|h| h.join(".local").join("state"))
+        })
+        .unwrap_or_else(|| std::path::PathBuf::from("/tmp"));
+    let log_dir = base_state.join("jollypad").join("logs");
+    std::fs::create_dir_all(&log_dir).ok();
+    let log_path = log_dir.join("jolly-home.log");
+    println!("📝 Jolly Home logs will be written to: {:?}", log_path);
 
     let log_file = fs::File::create(&log_path).context("Failed to create log file")?;
     let log_file_err = log_file.try_clone().context("Failed to clone log file handle")?;
 
-    // Find jolly-home binary
-    let cwd = std::env::current_dir()?;
-    let mut home_binary = cwd.join("target/debug/jolly-home");
-    if !home_binary.exists() {
-        let release_binary = cwd.join("target/release/jolly-home");
-        if release_binary.exists() {
-            home_binary = release_binary;
-        } else {
-            // Fallback to expecting it in PATH if not found in target
-            home_binary = std::path::PathBuf::from("jolly-home");
+    // Resolve jolly-home binary candidates
+    // Priority:
+    // 1) JOLLY_HOME_BIN env override
+    // 2) Same directory as current executable
+    // 3) Sibling in target/{release,debug} next to current executable
+    // 4) CWD target/{release,debug}
+    // 5) PATH fallback ("jolly-home")
+    let mut candidates: Vec<std::path::PathBuf> = Vec::new();
+
+    if let Ok(override_path) = std::env::var("JOLLY_HOME_BIN") {
+        candidates.push(std::path::PathBuf::from(override_path));
+    }
+
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            candidates.push(dir.join("jolly-home"));
+
+            // If running from cargo target dir, try sibling binary
+            if let Some(dir_name) = dir.file_name().and_then(|n| n.to_str()) {
+                if dir_name == "release" || dir_name == "debug" {
+                    candidates.push(dir.join("jolly-home"));
+                }
+            }
         }
     }
 
+    // Developer workflow: try from project CWD target dirs
+    if let Ok(cwd) = std::env::current_dir() {
+        candidates.push(cwd.join("target/release/jolly-home"));
+        candidates.push(cwd.join("target/debug/jolly-home"));
+    }
+
+    // PATH fallback
+    candidates.push(std::path::PathBuf::from("jolly-home"));
+
+    // Pick first existing candidate (if absolute/relative path), otherwise use PATH fallback
+    let mut chosen = None;
+    for c in &candidates {
+        // For plain "jolly-home", let PATH resolve it below
+        if c.components().count() > 1 || c.as_os_str() != "jolly-home" {
+            if c.exists() {
+                chosen = Some(c.clone());
+                break;
+            }
+        }
+    }
+
+    let home_binary = chosen.unwrap_or_else(|| std::path::PathBuf::from("jolly-home"));
+
     println!("🏠 Spawning Jolly Home from: {:?}", home_binary);
 
-    Command::new(home_binary)
+    Command::new(&home_binary)
         .stdout(Stdio::from(log_file))
         .stderr(Stdio::from(log_file_err))
         .spawn()
-        .context("Failed to spawn jolly-home")?;
+        .with_context(|| format!("Failed to spawn jolly-home at {:?}", home_binary))?;
         
     Ok(())
 }

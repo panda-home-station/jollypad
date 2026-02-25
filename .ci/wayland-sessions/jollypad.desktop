@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=JollyPad
 Comment=Panda Home Station Game Console
-Exec=/usr/bin/jollypad
+Exec=jolly-launcher
 Type=Application
 DesktopNames=JollyPad
