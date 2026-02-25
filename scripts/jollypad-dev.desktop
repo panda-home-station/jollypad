@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=JollyPad (dev)
+Comment=JollyPad development session
+Exec=/usr/local/bin/jolly-launcher
+Type=Application
+DesktopNames=JollyPad-dev
+X-GDM-SessionRegisters=true
+X-Session-Type=wayland
