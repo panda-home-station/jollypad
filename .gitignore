@@ -1,4 +1,4 @@
-apps/catacomb
+crates/catacomb
 assets
 artifacts
 
@@ -8,4 +8,3 @@ tmp
 target
 log
 *.log
-*.sh
