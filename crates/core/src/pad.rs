@@ -48,14 +48,32 @@ impl IconLoader {
     pub fn new() -> Self {
         let mut icons: HashMap<String, HashMap<ImageType, PathBuf>> = HashMap::new();
 
-        // Local assets fallback (assets/icons)
-        // Check relative to CWD and relative to executable location
+        // Build local search paths
         let mut local_search_paths: Vec<PathBuf> = Vec::new();
+
+        // 1. Check environment variable JOLLYPAD_ICON_DIR
+        if let Ok(icon_dir) = std::env::var("JOLLYPAD_ICON_DIR") {
+            local_search_paths.push(PathBuf::from(icon_dir));
+        }
+
+        // 2. Check relative to executable
+        if let Ok(exe_path) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_path.parent() {
+                // Try ../share/jollypad/icons (relative to binary)
+                local_search_paths.push(exe_dir.join("../share/jollypad/icons"));
+                // Try ./icons (same dir as binary)
+                local_search_paths.push(exe_dir.join("icons"));
+            }
+        }
+
+        // 3. Check current working directory (for dev)
         if let Ok(cwd) = std::env::current_dir() {
-            // Check current dir
             local_search_paths.push(cwd.join("assets/icons"));
         }
-        
+
+        // 4. Standard system path
+        local_search_paths.push(PathBuf::from("/usr/share/jollypad/icons"));
+
         for dir in local_search_paths {
             if let Ok(entries) = fs::read_dir(dir) {
                 for entry in entries.flatten() {

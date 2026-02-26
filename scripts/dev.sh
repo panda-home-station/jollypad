@@ -9,6 +9,7 @@ DESKTOP_NAME="${DESKTOP_NAME_OVERRIDE:-JollyPad-dev}"
 SUDO=""
 if [ "${EUID:-$(id -u)}" -ne 0 ]; then SUDO="sudo"; fi
 BIN_DIR="${BIN_DIR:-/usr/local/bin}"
+DATA_DIR="${DATA_DIR:-/usr/share/jollypad}"
 BIN_NAMES=("jolly-home" "jolly-launcher" "jolly-nav" "jolly-settings")
 build() {
   (cd "${DIR}" && cargo build --release)
@@ -24,10 +25,22 @@ install_binaries() {
     ${SUDO} install -m 755 "${src}" "${BIN_DIR}/${b}"
   done
 }
+install_assets() {
+  local icon_src="${DIR}/assets/icons"
+  local icon_dest="${DATA_DIR}/icons"
+  if [ -d "${icon_src}" ]; then
+    ${SUDO} mkdir -p "${icon_dest}"
+    ${SUDO} cp -r "${icon_src}"/* "${icon_dest}/"
+    printf "Installed icons to %s\n" "${icon_dest}"
+  else
+    printf "Warning: Icons directory not found at %s\n" "${icon_src}" >&2
+  fi
+}
 install_session() {
   ${SUDO} mkdir -p "${SYSTEM_DIR}"
   build
   install_binaries
+  install_assets
   if [ ! -f "${SRC}" ]; then
     printf "missing template: %s\n" "${SRC}" >&2
     exit 1

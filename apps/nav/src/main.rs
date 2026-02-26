@@ -465,17 +465,41 @@ fn load_icon(icon_name: &str) -> Option<Image> {
         if std::path::Path::new(icon_name).is_file() {
             return Some(PathBuf::from(icon_name));
         }
-        
-        let search_paths = vec![
-            "/home/jolly/phs/jollypad/assets/icons",
-            "/usr/share/icons/hicolor/512x512/apps",
-            "/usr/share/icons/hicolor/256x256/apps",
-            "/usr/share/icons/hicolor/128x128/apps",
-            "/usr/share/icons/hicolor/64x64/apps",
-            "/usr/share/icons/Adwaita/64x64/places",
-            "/usr/share/icons/Adwaita/64x64/apps",
-            "/usr/share/pixmaps",
-        ];
+
+        // Build search paths dynamically
+        let mut search_paths: Vec<String> = Vec::new();
+
+        // 1. Check environment variable JOLLYPAD_ICON_DIR
+        if let Ok(icon_dir) = std::env::var("JOLLYPAD_ICON_DIR") {
+            search_paths.push(icon_dir);
+        }
+
+        // 2. Check relative to executable
+        if let Ok(exe_path) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_path.parent() {
+                // Try ../share/jollypad/icons (relative to binary)
+                search_paths.push(exe_dir.join("../share/jollypad/icons").to_string_lossy().into_owned());
+                // Try ./icons (same dir as binary)
+                search_paths.push(exe_dir.join("icons").to_string_lossy().into_owned());
+            }
+        }
+
+        // 3. Check current working directory (for dev)
+        if let Ok(cwd) = std::env::current_dir() {
+            search_paths.push(cwd.join("assets/icons").to_string_lossy().into_owned());
+        }
+
+        // 4. Standard system paths
+        search_paths.extend(vec![
+            "/usr/share/jollypad/icons".to_string(),
+            "/usr/share/icons/hicolor/512x512/apps".to_string(),
+            "/usr/share/icons/hicolor/256x256/apps".to_string(),
+            "/usr/share/icons/hicolor/128x128/apps".to_string(),
+            "/usr/share/icons/hicolor/64x64/apps".to_string(),
+            "/usr/share/icons/Adwaita/64x64/places".to_string(),
+            "/usr/share/icons/Adwaita/64x64/apps".to_string(),
+            "/usr/share/pixmaps".to_string(),
+        ]);
 
         let extensions = ["png", "svg", "xpm"];
 
@@ -485,6 +509,11 @@ fn load_icon(icon_name: &str) -> Option<Image> {
                 if p.is_file() {
                     return Some(p);
                 }
+            }
+            // Try without extension
+            let p = PathBuf::from(format!("{}/{}", path, icon_name));
+            if p.is_file() {
+                return Some(p);
             }
         }
         None

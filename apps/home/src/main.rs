@@ -502,10 +502,33 @@ fn resolve_icon_path(icon_name: &str) -> Option<std::path::PathBuf> {
     if p.is_absolute() && p.is_file() {
         return Some(p);
     }
-    
-    // Simple lookup in common dirs
-    let dirs = [
-        "/home/jolly/phs/jollypad/assets/icons",
+
+    // Build search paths dynamically
+    let mut dirs: Vec<&'static str> = Vec::new();
+
+    // 1. Check environment variable JOLLYPAD_ICON_DIR
+    if let Ok(icon_dir) = std::env::var("JOLLYPAD_ICON_DIR") {
+        dirs.push(Box::leak(icon_dir.into_boxed_str()));
+    }
+
+    // 2. Check relative to executable
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            // Try ../share/jollypad/icons (relative to binary)
+            dirs.push(Box::leak(exe_dir.join("../share/jollypad/icons").to_string_lossy().into_owned().into_boxed_str()));
+            // Try ./icons (same dir as binary)
+            dirs.push(Box::leak(exe_dir.join("icons").to_string_lossy().into_owned().into_boxed_str()));
+        }
+    }
+
+    // 3. Check current working directory (for dev)
+    if let Ok(cwd) = std::env::current_dir() {
+        dirs.push(Box::leak(cwd.join("assets/icons").to_string_lossy().into_owned().into_boxed_str()));
+    }
+
+    // 4. Standard system paths
+    dirs.extend([
+        "/usr/share/jollypad/icons",
         "/usr/share/pixmaps",
         "/usr/share/icons/hicolor/512x512/apps",
         "/usr/share/icons/hicolor/256x256/apps",
@@ -514,7 +537,7 @@ fn resolve_icon_path(icon_name: &str) -> Option<std::path::PathBuf> {
         "/usr/share/icons/hicolor/scalable/apps",
         "/usr/share/icons/Adwaita/48x48/apps",
         "/usr/share/icons/Adwaita/scalable/apps",
-    ];
+    ]);
     
     let extensions = ["png", "svg", "xpm"];
     
