@@ -16,10 +16,16 @@ slint::include_modules!();
 
 fn main() -> Result<(), slint::PlatformError> {
     println!("DEBUG: jolly-nav starting...");
+    // Ensure Wayland app_id is set for robust compositor matching
+    std::env::set_var("SLINT_WAYLAND_APP_ID", "jolly-nav");
+    std::env::set_var("WAYLAND_APP_ID", "jolly-nav");
+    std::env::set_var("WINIT_APP_ID", "jolly-nav");
+    std::env::set_var("APP_ID", "jolly-nav");
     let ui = NavOverlay::new()?;
 
-    // Register system role for Nav overlay (optional)
-    CatacombClient::set_system_role("nav", "JollyPad-Overlay");
+    // Register system role for Nav overlay (app_id preferred)
+    CatacombClient::set_system_role("nav", "^jolly-nav$");
+    CatacombClient::set_system_role("overlay", "^jolly-nav$");
 
     // Navbar Items
     let nav_model: Rc<VecModel<PadItem>> = Rc::new(VecModel::default());
@@ -116,8 +122,8 @@ fn main() -> Result<(), slint::PlatformError> {
                     // Check if active
                     let active_info = CatacombClient::get_active_window();
                     println!("DEBUG: Active window info: {:?}", active_info);
-                    let is_active = if let Some((title, _)) = active_info {
-                        title == "JollyPad-Overlay"
+                    let is_active = if let Some((_, app_id)) = active_info {
+                        app_id == "jolly-nav"
                     } else {
                         false
                     };
@@ -140,6 +146,9 @@ fn main() -> Result<(), slint::PlatformError> {
                             thread::spawn(move || {
                                 thread::sleep(Duration::from_millis(100));
                                 jollypad_core::CatacombClient::role_action("overlay", "back", None);
+                                if let Some((t, id)) = jollypad_core::CatacombClient::get_active_window() {
+                                    println!("DEBUG: After overlay back, active window: '{}' / '{}'", t, id);
+                                }
                                 // Reset while hidden so next open is clean
                                 thread::sleep(Duration::from_millis(100));
                                 let _ = slint::invoke_from_event_loop(move || {
@@ -169,15 +178,16 @@ fn main() -> Result<(), slint::PlatformError> {
                                 let _ = std::process::Command::new("catacomb")
                                     .arg("msg")
                                     .arg("toggle-window")
-                                    .arg("JollyPad-Overlay")
+                                    .arg("jolly-nav")
                                     .spawn();
+                                println!("DEBUG: toggle-window command sent");
                                 
                                 let start = Instant::now();
                                 let mut focused = false;
                                 for _ in 0..20 {
                                     thread::sleep(Duration::from_millis(20));
-                                    if let Some((title, _)) = jollypad_core::CatacombClient::get_active_window() {
-                                        if title == "JollyPad-Overlay" {
+                                    if let Some((_, app_id)) = jollypad_core::CatacombClient::get_active_window() {
+                                        if app_id == "jolly-nav" {
                                             focused = true;
                                             break;
                                         }
@@ -191,6 +201,9 @@ fn main() -> Result<(), slint::PlatformError> {
                                     if let Some(ui) = ui_weak.upgrade() {
                                         println!("DEBUG: UI ready set to true (delay {:?})", start.elapsed());
                                         ui.set_ready(true);
+                                        if let Some((t, id)) = jollypad_core::CatacombClient::get_active_window() {
+                                            println!("DEBUG: After overlay open, active window: '{}' / '{}'", t, id);
+                                        }
                                     } else {
                                         println!("DEBUG: UI upgrade failed in thread");
                                     }
